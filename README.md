@@ -11,3 +11,5 @@ Master username: posgres <br />
 Master password: sportsanalyticspssword <br />
 Host link: sportsdatabase.c9wy48s2kma9.us-east-2.rds.amazonaws.com <br />
 Db_port: 5432 <br />
+
+Figma Link: https://www.figma.com/make/sHthJ4aYbfWQ0wRKPw8irh/Sports-Analytics-Dashboard-Design?node-id=0-1&t=7oJmcFIcxTiiJqeR-1

@@ -1,0 +1,58 @@
+.main-content {
+  flex: 1;
+  padding: 40px 48px;
+}
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.main-header h1 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+.main-header p {
+  margin: 4px 0 0 0;
+  color: #666;
+}
+.main-header-actions button {
+  margin-left: 12px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.import-btn {
+  background: #f3f4f6;
+  color: #333;
+}
+.create-btn {
+  background: #22c55e;
+  color: #fff;
+}
+.search-bar {
+  margin: 32px 0 24px 0;
+  display: flex;
+  align-items: center;
+}
+.search-bar input {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-right: 18px;
+}
+.tables-used {
+  color: #666;
+  font-size: 0.98rem;
+  background: #f3f4f6;
+  padding: 6px 14px;
+  border-radius: 6px;
+}
+.table-cards {
+  display: flex;
+  gap: 28px;
+}

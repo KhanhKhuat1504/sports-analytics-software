@@ -1,14 +1,14 @@
 import React from "react";
 import Uploady from "@rpldy/uploady";
-import UploadButton, {asUploadButton} from "@rpldy/upload-button";
+import {asUploadButton} from "@rpldy/upload-button";
 
 const ImportButton = asUploadButton((props) => {
-    return <button className="import-btn">Import CSV</button>
+    return <button className="import-btn" {...props}>Import CSV</button>
 });
 
 const ImportCSV = () => (
-	<Uploady destination={{ url: "/" }}>
-		<UploadButton/>
+	<Uploady destination={{ url: "/" }} accept=".csv">
+		<ImportButton/>
 	</Uploady>
 );
 

@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@rpldy/upload-button": "^1.11.0",
+    "@rpldy/uploady": "^1.11.0",
     "ag-grid-community": "^34.2.0",
     "ag-grid-react": "^34.2.0",
     "bootstrap": "^5.3.8",

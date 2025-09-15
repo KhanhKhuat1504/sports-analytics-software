@@ -7,6 +7,7 @@ import { playersColumns, playersRows } from "../../sample_data/PlayersData";
 import { performanceColumns, performanceRows } from "../../sample_data/PerformanceData";
 import { matchesColumns, matchesRows } from "../../sample_data/MatchData";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
+import ImportCSV from "../ImportCSV/ImportCSV";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 type TableKey = "players" | "matches" | "performance";
@@ -19,7 +20,6 @@ const tableData: Record<TableKey, { columns: any[]; rows: any[] }> = {
 
 const MainContent = () => {
   const [selectedTable, setSelectedTable] = useState<TableKey | null>(null);
-  console.log(selectedTable);
 
   return (
     <main className="main-content">
@@ -29,7 +29,7 @@ const MainContent = () => {
           <p>Manage your data tables, schemas, and analytics datasets</p>
         </div>
         <div className="main-header-actions">
-          <button className="import-btn">Import CSV</button>
+          <ImportCSV/>
           <button className="create-btn">+ Create Table</button>
         </div>
       </header>

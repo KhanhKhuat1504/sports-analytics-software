@@ -1,25 +1,88 @@
 import React, { useState } from "react";
 import TableCard from "../TableCard/TableCard";
+import AddRowModal from "../Modals/AddRowModal";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./MainContent.css";
-import { playersColumns, playersRows } from "../../sample_data/PlayersData";
-import { performanceColumns, performanceRows } from "../../sample_data/PerformanceData";
-import { matchesColumns, matchesRows } from "../../sample_data/MatchData";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import ImportCSV from "../ImportCSV/ImportCSV";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 type TableKey = "players" | "matches" | "performance";
 
-const tableData: Record<TableKey, { columns: any[]; rows: any[] }> = {
-  players: { columns: playersColumns, rows: playersRows },
-  matches: { columns: matchesColumns, rows: matchesRows },
-  performance: { columns: performanceColumns, rows: performanceRows },
-};
-
 const MainContent = () => {
   const [selectedTable, setSelectedTable] = useState<TableKey | null>(null);
+  const [rowData, setRowData] = useState<any[]>([]);
+  const [columnDefs, setColumnDefs] = useState<any[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newRowData, setNewRowData] = useState<any>({});
+  const [addError, setAddError] = useState<string | null>(null);
+
+  const defaultColDef = useMemo(() => ({
+    sortable: true,
+    editable: true,
+    filter: true,
+    floatingFilter: true,
+    resizable: true,
+  }), []);
+
+  // Inside your MainContent component
+
+  const handleAddRow = async () => {
+    if (!selectedTable) {
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:5000/api/table/${selectedTable}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: newRowData }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        setAddError(errorData.detail || "Failed to add row");
+        return;
+      }
+      const data = await res.json();
+      setRowData(prev => [...prev, data.row]);
+      setShowAddModal(false);
+      setNewRowData({});
+      setAddError(null);
+    } catch (err) {
+      setAddError("Network error");
+    }
+  };
+
+  const handleUpdateRow = async (updatedRowData: any, columnName: string) => {
+    try {
+      if (selectedTable) {
+        await fetch(`http://localhost:5000/api/table/${selectedTable}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            data: updatedRowData,
+            column_name: columnName,
+          }),
+        });
+      }
+    } catch (error) {
+      console.error("Error updating row:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedTable) {
+      fetch(`http://localhost:5000/api/table/${selectedTable}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setRowData(data.rows);
+          setColumnDefs(data.columns);
+        });
+    } else {
+      setRowData([]);
+      setColumnDefs([]);
+    }
+  }, [selectedTable]);
 
   return (
     <main className="main-content">
@@ -78,11 +141,33 @@ const MainContent = () => {
           <button onClick={() => setSelectedTable(null)} style={{ marginBottom: 16 }}>
             ← Back to Tables
           </button>
+          {selectedTable && (
+            <button onClick={() => setShowAddModal(true)} style={{ marginBottom: 16 }}>
+              + Add Row
+            </button>
+          )}
           <AgGridReact
-            rowData={selectedTable ? tableData[selectedTable].rows : []}
-            columnDefs={selectedTable ? tableData[selectedTable].columns : []}
-            domLayout="autoHeight"
+            rowData={rowData}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            singleClickEdit={true}
+            onCellValueChanged={(params) => handleUpdateRow(params.data, params.colDef.field ?? "")}
+            stopEditingWhenCellsLoseFocus={true}
           />
+          {showAddModal && (
+            <AddRowModal
+              columnDefs={columnDefs}
+              requiredColumns={["id"]}
+              newRowData={newRowData}
+              setNewRowData={setNewRowData}
+              onAdd={handleAddRow}
+              onCancel={() => {
+                setShowAddModal(false);
+                setNewRowData({});
+              }}
+              addError={addError}
+            />
+          )}
         </div>
       )}
     </main>

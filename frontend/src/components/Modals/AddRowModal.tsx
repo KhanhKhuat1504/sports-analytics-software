@@ -25,7 +25,7 @@ const AddRowModal: React.FC<AddRowModalProps> = ({
 
   const handleMissingRequiredFields = () => {
     for (const field of requiredColumns) {
-      if (!newRowData[field] || newRowData[field].trim() === "") {
+      if (newRowData[field].trim() === "") {
         setMissingRequiredFieldsError(`"${field}" is required.`);
         return;
       }

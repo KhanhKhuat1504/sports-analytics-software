@@ -1,27 +1,30 @@
-# from sqlalchemy.orm import Session
-# from models import Player
+from database import get_connection
 
-# def get_players(db: Session):
-#     return db.query(Player).all()
+def get_table_data(table_name):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(f"SELECT * FROM {table_name}")
+            rows = cur.fetchall()
+            # Optionally, fetch column names for AG Grid
+            colnames = [desc[0] for desc in cur.description]
+            return {"columns": colnames, "rows": rows}
 
-# def get_player(db: Session, player_id: int):
-#     return db.query(Player).filter(Player.id == player_id).first()
+def add_table_row(table_name, row):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            columns = ', '.join(row.keys())
+            values = ', '.join(['%s'] * len(row))
+            sql = f"INSERT INTO {table_name} ({columns}) VALUES ({values}) RETURNING *"
+            cur.execute(sql, list(row.values()))
+            conn.commit()
+            return cur.fetchone()
 
-# def create_player(db: Session, player_data):
-#     db_player = Player(**player_data.dict())
-#     db.add(db_player)
-#     db.commit()
-#     db.refresh(db_player)
-#     return db_player
-
-# def update_player(db: Session, player_id: int, player_data):
-#     db_player = db.query(Player).filter(Player.id == player_id).first()
-#     for key, value in player_data.dict().items():
-#         setattr(db_player, key, value)
-#     db.commit()
-#     return db_player
-
-# def delete_player(db: Session, player_id: int):
-#     db_player = db.query(Player).filter(Player.id == player_id).first()
-#     db.delete(db_player)
-#     db.commit()
+def update_table_row(table_name, row, key_field="id"):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            set_clause = ', '.join([f"{k}=%s" for k in row.keys() if k != key_field])
+            sql = f"UPDATE {table_name} SET {set_clause} WHERE {key_field}=%s RETURNING *"
+            values = [row[k] for k in row if k != key_field] + [row[key_field]]
+            cur.execute(sql, values)
+            conn.commit()
+            return cur.fetchone()

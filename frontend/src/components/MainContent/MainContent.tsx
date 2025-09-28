@@ -1,5 +1,6 @@
 import React from "react"; 
 import { useMemo, useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import TableCard from "../TableCard/TableCard";
 import AddRowModal from "../Modals/AddRowModal";
 import { AgGridReact } from "ag-grid-react";
@@ -11,12 +12,15 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 type TableKey = "players" | "matches" | "performance";
 
 const MainContent = () => {
-  const [selectedTable, setSelectedTable] = useState<TableKey | null>(null);
   const [rowData, setRowData] = useState<any[]>([]);
   const [columnDefs, setColumnDefs] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newRowData, setNewRowData] = useState<any>({});
   const [addError, setAddError] = useState<string | null>(null);
+  const [tableMeta, setTableMeta] = useState<any[]>([]);
+  const { selectedTable } = useParams();
+
+  const navigate = useNavigate();
 
   const defaultColDef = useMemo(() => ({
     sortable: true,
@@ -84,6 +88,13 @@ const MainContent = () => {
     }
   }, [selectedTable]);
 
+  useEffect(() => {
+    fetch("http://localhost:5000/api/table/get-tables")
+      .then(res => res.json())
+      .then(data => setTableMeta(data));
+  }, []);
+
+
   return (
     <main className="main-content">
       <header className="main-header">
@@ -102,43 +113,25 @@ const MainContent = () => {
       </div>
       {!selectedTable ? (
         <div className="table-cards">
-          <TableCard
-            title="Players"
-            tag="players"
-            tagColor="blue"
-            description="Player roster and basic information"
-            rows={187}
-            columns={8}
-            modified="1/14/2024"
-            by="Admin"
-            onClick={() => setSelectedTable("players")}
-          />
-          <TableCard
-            title="Match Results"
-            tag="matches"
-            tagColor="green"
-            description="Game outcomes and match statistics"
-            rows={45}
-            columns={12}
-            modified="1/13/2024"
-            by="Analyst"
-            onClick={() => setSelectedTable("matches")}
-          />
-          <TableCard
-            title="Performance Metrics"
-            tag="performance"
-            tagColor="purple"
-            description="Individual player performance data"
-            rows={2456}
-            columns={15}
-            modified="1/12/2024"
-            by="Coach"
-            onClick={() => setSelectedTable("performance")}
-          />
+          {tableMeta.map(table => (
+            console.log(table.key),
+            <TableCard
+              key={table.key}
+              title={table.key.charAt(0).toUpperCase() + table.key.slice(1)}
+              tag={table.key}
+              tagColor="blue" // or use a color map if you want
+              description={`Table for ${table.key}`}
+              rows={table.rows}
+              columns={table.columns}
+              modified="N/A"
+              by="Admin"
+              onClick={() => navigate(`/tables/${table.key}`)}
+            />
+          ))}
         </div>
       ) : (
         <div style={{ height: 400, width: "100%" }} className="ag-theme-quartz">
-          <button onClick={() => setSelectedTable(null)} style={{ marginBottom: 16 }}>
+          <button onClick={() => navigate(`/tables/`)} style={{ marginBottom: 16 }}>
             ← Back to Tables
           </button>
           {selectedTable && (

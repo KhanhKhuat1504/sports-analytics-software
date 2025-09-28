@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
+import { useMemo, useState, useEffect } from "react";
 import TableCard from "../TableCard/TableCard";
 import AddRowModal from "../Modals/AddRowModal";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./MainContent.css";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
-import ImportCSV from "../ImportCSV/ImportCSV";
 ModuleRegistry.registerModules([AllCommunityModule]);
+import ImportCSV from "../ImportCSV/ImportCSV";
 
 type TableKey = "players" | "matches" | "performance";
 

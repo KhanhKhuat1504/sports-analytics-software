@@ -7,7 +7,7 @@ const ImportButton = asUploadButton((props) => {
 });
 
 const ImportCSV = () => (
-	<Uploady destination={{ url: "http://localhost:5000" }} accept=".csv">
+	<Uploady destination={{ url: "http://localhost:5000/api/upload/" }} accept=".csv">
 		<ImportButton/>
 	</Uploady>
 );

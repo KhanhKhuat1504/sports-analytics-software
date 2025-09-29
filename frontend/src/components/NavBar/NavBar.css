@@ -1,0 +1,48 @@
+.navbar {
+  width: 100%;
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid #f0f1f3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navbar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #22223b;
+}
+
+.navbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.team-select {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #e0e1e3;
+  background: #f7f8fa;
+  font-size: 1rem;
+  color: #22223b;
+  outline: none;
+  min-width: 140px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.username {
+  font-size: 1rem;
+  color: #22223b;
+  font-weight: 500;
+}

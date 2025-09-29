@@ -1,4 +1,4 @@
-import React from "react"; 
+import React from "react";
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TableCard from "../TableCard/TableCard";
@@ -8,6 +8,7 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./MainContent.css";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 ModuleRegistry.registerModules([AllCommunityModule]);
+import ImportCSV from "../ImportCSV/ImportCSV";
 
 type TableKey = "players" | "matches" | "performance";
 
@@ -103,7 +104,7 @@ const MainContent = () => {
           <p>Manage your data tables, schemas, and analytics datasets</p>
         </div>
         <div className="main-header-actions">
-          <button className="import-btn">Import CSV</button>
+          <ImportCSV/>
           <button className="create-btn">+ Create Table</button>
         </div>
       </header>

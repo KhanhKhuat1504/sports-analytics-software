@@ -24,10 +24,6 @@
   cursor: pointer;
   font-size: 1rem;
 }
-.import-btn {
-  background: #f3f4f6;
-  color: #333;
-}
 .create-btn {
   background: #22c55e;
   color: #fff;

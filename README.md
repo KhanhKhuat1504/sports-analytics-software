@@ -1,7 +1,11 @@
 # csds395-sports-analytics-software
+universal email account:
+sportsanalyticscsds@gmail.com <br />
+thispsswordisshared <br />
+
 
 Root User email:
-ajh295@case.edu <br />
+sportsanalyticscsds@gmail.com <br />
 Password: SportsAnalytics25! <br />
 
 

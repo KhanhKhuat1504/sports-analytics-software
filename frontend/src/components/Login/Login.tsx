@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import "./Login.css";
 
 function Login() {
 //     VIBE CODE DO NOT USE
@@ -39,7 +40,7 @@ function Login() {
 
 // STYLING USES BOOTSTRAP
     return(
-        <div className="container">
+        <div className="container d-flex justify-content-center align-items-center vh-100">
             <div className="card shadow-md">
                 <div className="card-body p-4">
                     <h2 className="text-center mb-3">Login</h2>

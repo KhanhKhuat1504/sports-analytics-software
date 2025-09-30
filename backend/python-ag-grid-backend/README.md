@@ -3,6 +3,7 @@ cd backend/python-ag-grid-backend
 
 activate venv
 python -m venv venv
+venv/Scripts/activate (tab)
 
 install libraries
 pip install -r requirements.txt

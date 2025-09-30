@@ -4,15 +4,16 @@ import MainContent from "./components/MainContent/MainContent";
 // import AllTeamsView from "./components/AllTeamsView/AllTeamsView";
 import NavBar from "./components/NavBar/NavBar";
 import AppLayout from './components/AppLayout/AppLayout';
+import Login from './components/Login/Login';
 
 function App() {
   return (
     <Router>
       {/* <NavBar /> */}
       <Routes>
+       <Route path="/" element={<Login />} />
 //         All Routes within the AppLayout have the sidebar
         <Route element={<AppLayout />}>
-            <Route path="/" element={<div>Test Home Route</div>} />
             <Route path="/tables" element={<MainContent />} />
             <Route path="/tables/:selectedTable" element={<MainContent />} />
             <Route path="/analytics" element={<div>Test Analytics Route</div>} />

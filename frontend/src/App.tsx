@@ -5,6 +5,7 @@ import MainContent from "./components/MainContent/MainContent";
 import NavBar from "./components/NavBar/NavBar";
 import AppLayout from './components/AppLayout/AppLayout';
 import Login from './components/Login/Login';
+import Register from './components/Register/Register';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       {/* <NavBar /> */}
       <Routes>
        <Route path="/" element={<Login />} />
+       <Route path="/register" element={<Register />} />
 //         All Routes within the AppLayout have the sidebar
         <Route element={<AppLayout />}>
             <Route path="/tables" element={<MainContent />} />

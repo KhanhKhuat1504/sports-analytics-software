@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Login() {
@@ -80,7 +81,7 @@ function Login() {
                     )}
                     <hr className="my-3" />
                     <p className="text-center mb-0">
-                        Don't have an account? <a href="/register-html">Register here</a>
+                        Don't have an account? <Link to="/register">Login here</Link>
                     </p>
                 </div>
             </div>

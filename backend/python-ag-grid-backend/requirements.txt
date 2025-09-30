@@ -3,3 +3,4 @@ pydantic
 python-jose[cryptography]
 passlib[bcrypt]
 uvicorn
+python_multipart

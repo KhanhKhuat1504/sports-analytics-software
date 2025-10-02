@@ -26,7 +26,7 @@ const TableCard: React.FC<TableCardProps> = ({
 }) => (
   <div className="table-card" onClick={onClick} style={{ cursor: onClick ? "pointer" : "default" }}>
     <div className="table-card-header">
-      <span className="table-icon">📋</span>
+      <span className="table-icon">📝</span>
       <span className={`table-tag ${tagColor}`}>{tag}</span>
     </div>
     <h3>{title}</h3>

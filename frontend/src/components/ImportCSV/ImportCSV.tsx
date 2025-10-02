@@ -2,8 +2,8 @@ import React from "react";
 import Uploady from "@rpldy/uploady";
 import {asUploadButton} from "@rpldy/upload-button";
 
-const ImportButton = asUploadButton((props) => {
-    return <button className="import-btn" {...props}>Import CSV</button>
+const ImportButton = asUploadButton((props: React.ComponentProps<'button'>) => {
+	return <button className="import-btn" {...props}>Import CSV</button>
 });
 
 const ImportCSV = () => (

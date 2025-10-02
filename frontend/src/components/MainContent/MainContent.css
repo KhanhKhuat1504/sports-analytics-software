@@ -52,6 +52,7 @@
 .table-cards {
   display: flex;
   gap: 28px;
+<<<<<<< Updated upstream
 =======
 .main-content {
   flex: 1;
@@ -107,4 +108,23 @@
   display: flex;
   gap: 28px;
 >>>>>>> 305e8bb (Barebone gradio chatbot page - Embedded as Iframe)
+=======
+}
+.delete-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: red;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.delete-btn:hover {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-radius: 50%;
+>>>>>>> Stashed changes
 }

@@ -12,7 +12,7 @@ const Sidebar = () => (
     </NavLink>
     <div className="sidebar-section">
       <div className="teams-view">
-        <span className="globe">🌐</span>
+        <span className="globe">🔎</span>
         <div>
           <div className="teams-title">All Teams View</div>
           <div className="teams-desc">Complete NBA overview</div>

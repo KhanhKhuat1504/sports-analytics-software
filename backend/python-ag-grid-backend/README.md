@@ -11,3 +11,4 @@ uvicorn main:app --reload --host {local_host_addr} --port {port_number}
 {port_number} - we are using port 5000
 
 python -m uvicorn main:app --reload --host 127.0.0.1 --port 5000
+Remember to install necessary packages: pip install {package_name}

@@ -4,6 +4,7 @@ import MainContent from "./components/MainContent/MainContent";
 // import AllTeamsView from "./components/AllTeamsView/AllTeamsView";
 import NavBar from "./components/NavBar/NavBar";
 import Sidebar from "./components/Sidebar/Sidebar";
+import AssistantFrame from "./components/Assistant/Assistant"
 import "./App.css";
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
             <Route path="/tables" element={<MainContent />} />
             <Route path="/tables/:selectedTable" element={<MainContent />} />
             <Route path="/analytics" element={<div>Test Analytics Route</div>} />
-            <Route path="/ai-assistant" element={<div>Test AI Assistant Route</div>} />
+            <Route path="/ai-assistant" element={<AssistantFrame />} />
           </Routes>
         </div>
       </div>

@@ -1,0 +1,11 @@
+uvicorn 
+smolagents
+smolagents[openai]
+smolagents[gradio]
+python-multipart
+dotenv
+sqlalchemy
+fastapi
+gradio
+transformers
+psycopg2-binary

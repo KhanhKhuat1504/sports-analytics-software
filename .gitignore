@@ -1,1 +1,24 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
 .idea
+=======
+=======
+<<<<<<< Updated upstream
+>>>>>>> 305e8bb (Barebone gradio chatbot page - Embedded as Iframe)
+.gradio 
+.venv 
+node_modules 
+package-lock.json
+package.json
+<<<<<<< HEAD
+>>>>>>> 9caf2ce (initial gradio_stuff)
+=======
+=======
+.idea
+.venv
+
+# Pycache
+__pycache__/
+.py[cod]
+>>>>>>> Stashed changes
+>>>>>>> 305e8bb (Barebone gradio chatbot page - Embedded as Iframe)

@@ -1,1 +1,11 @@
-.idea
+.gradio 
+.venv 
+node_modules 
+package-lock.json
+package.json
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

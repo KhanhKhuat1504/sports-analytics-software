@@ -9,6 +9,7 @@ function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,17 +18,28 @@ function Login() {
 
         try {
             const response = await fetch('/login-html', {
+            const formData = new URLSearchParams();
+            formData.append("username", username);
+            formData.append("password", password);
+            const response = await fetch('http://localhost:5000/api/login/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: JSON.stringify({ username, password }),
+                body: formData.toString(),
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 console.log('Login successful:', data);
+
+                localStorage.setItem("token", data.access_token)
+                localStorage.setItem("token-type", data.token_type)
+
+                navigate("/")
             } else {
                 setError(data.error || 'Login failed');
             }

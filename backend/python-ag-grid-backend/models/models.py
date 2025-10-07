@@ -1,12 +1,17 @@
 from pydantic import BaseModel
-from typing import Dict, Any
+from typing import List, Dict, Any
 
-class TableRowUpdate(BaseModel):
+class TableRowUpdateRequest(BaseModel):
     data: dict
     column_name: str
 
-class TableRowAdd(BaseModel):
+class TableRowAddRequest(BaseModel):
     data: dict
+
+class CreateTableRequest(BaseModel):
+    table_name: str
+    columns: List[Dict[str, str]]  # [{"name": "id", "type": "SERIAL PRIMARY KEY"}, ...]
+
 # to replace
 # from sqlalchemy import Column, Integer, String
 # from database import Base

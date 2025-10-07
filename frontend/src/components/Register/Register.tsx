@@ -21,7 +21,7 @@ function Register() {
 
             try {
                 // Replace this URL with your actual API endpoint
-                const response = await fetch('/api/register', {
+                const response = await fetch('http://localhost:5000/api/login/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ function Register() {
                                          name="full_name"
                                          placeholder="Full Name"
                                          value={full_name}
-                                         onChange={(e) => setPassword(e.target.value)}
+                                         onChange={(e) => setFullName(e.target.value)}
                                          required
                                      />
                                 </div>

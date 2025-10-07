@@ -4,12 +4,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Login.css";
 
 function Login() {
-//     VIBE CODE DO NOT USE
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,17 +15,14 @@ function Login() {
         setError('');
 
         try {
-            const response = await fetch('/login-html', {
             const formData = new URLSearchParams();
             formData.append("username", username);
             formData.append("password", password);
             const response = await fetch('http://localhost:5000/api/login/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: JSON.stringify({ username, password }),
                 body: formData.toString(),
             });
 
@@ -87,11 +82,6 @@ function Login() {
                             {loading ? 'Loading...' : 'Login'}
                         </button>
                     </form>
-                    {error && (
-                        <div className="alert alert-danger mt-3 mb-0" role="alert">
-                            {error}
-                        </div>
-                    )}
                     <hr className="my-3" />
                     <p className="text-center mb-0">
                         Don't have an account? <Link to="/register">Login here</Link>

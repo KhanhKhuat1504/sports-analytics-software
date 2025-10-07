@@ -7,48 +7,48 @@ import './Register.css';
 function Register() {
 // VIBE CODE
     const [username, setUsername] = useState('');
-        const [password, setPassword] = useState('');
-        const [full_name, setFullName] = useState('');
-        const [loading, setLoading] = useState(false);
-        const [error, setError] = useState('');
-        const [success, setSuccess] = useState('');
+            const [password, setPassword] = useState('');
+            const [full_name, setFullName] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            const [success, setSuccess] = useState('');
 
-        const handleSubmit = async (e) => {
-            e.preventDefault();
-            setError('');
-            setSuccess('');
-            setLoading(true);
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError('');
+                setSuccess('');
+                setLoading(true);
 
-            try {
-                // Replace this URL with your actual API endpoint
-                const response = await fetch('http://localhost:5000/api/login/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username,
-                        password,
-                        full_name
-                    }),
-                });
+                try {
+                    // Replace this URL with your actual API endpoint
+                    const response = await fetch('http://localhost:5000/api/login/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username,
+                            password,
+                            full_name
+                        }),
+                    });
 
-                const data = await response.json();
+                    const data = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(data.message || 'Registration failed');
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Registration failed');
+                    }
+
+                    setSuccess('Registration successful!');
+                    // Optional: redirect to login or dashboard
+                    // window.location.href = '/login';
+
+                } catch (err) {
+                    setError(err.message || 'An error occurred during registration');
+                } finally {
+                    setLoading(false);
                 }
-
-                setSuccess('Registration successful!');
-                // Optional: redirect to login or dashboard
-                // window.location.href = '/login';
-
-            } catch (err) {
-                setError(err.message || 'An error occurred during registration');
-            } finally {
-                setLoading(false);
-            }
-        };
+            };
 
 // USES BOOTSTRAP STYLING
     return(
@@ -85,7 +85,6 @@ function Register() {
                                          className="form-control"
                                          name="full_name"
                                          placeholder="Full Name"
-                                         value={full_name}
                                          onChange={(e) => setFullName(e.target.value)}
                                          required
                                      />

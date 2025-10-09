@@ -25,9 +25,6 @@ const MainContent = () => {
   const [addError, setAddError] = useState<string | null>(null);
   const [tableMeta, setTableMeta] = useState<any[]>([]);
   const { selectedTable } = useParams();
-  console.log(rowData);
-  console.log(columnDefs);
-  console.log(tableMeta);
 
   const navigate = useNavigate();
 

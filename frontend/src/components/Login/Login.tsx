@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Login.css";
 
@@ -8,6 +8,8 @@ function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,7 +36,7 @@ function Login() {
                 localStorage.setItem("token", data.access_token)
                 localStorage.setItem("token-type", data.token_type)
 
-                navigate("/")
+                navigate("/tables")
             } else {
                 setError(data.error || 'Login failed');
             }
@@ -45,7 +47,6 @@ function Login() {
         }
     };
 
-// STYLING USES BOOTSTRAP
     return(
         <div className="container d-flex justify-content-center align-items-center vh-100">
             <div className="card shadow-md">

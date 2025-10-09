@@ -11,12 +11,12 @@ from typing import Optional
 router = APIRouter()
 
 #configurations
-SECRET_KEY = "CHANGE_ME_IN_PRODUCTION"          # Use an env var in real apps
+SECRET_KEY = "CHANGE_ME_IN_PRODUCTION"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")  # token comes from /login
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 #pydantic models
 class UserCreate(BaseModel):
@@ -71,45 +71,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserPublic:
         raise cred_exc
     return UserPublic(username=user["username"], full_name=user.get("full_name"))
 
-#Routes - registration, login, and protected endpoint
-
-# # HTML registration page (GET)
-# @router.get("/register-html", response_class=HTMLResponse)
-# def register_page(request: Request):
-#     return templates.TemplateResponse("register.html", {"request": request})
-
-# # HTML registration form handler (POST)
-# @router.post("/register-html", response_class=HTMLResponse)
-# def register_html(request: Request, username: str = Form(...), password: str = Form(...), full_name: str = Form("")):
-#     try:
-#         hashed = hash_password(password)
-#         create_user(username, hashed, full_name)
-#         return templates.TemplateResponse("register.html", {"request": request, "success": "Registration successful! Please log in."})
-#     except HTTPException as e:
-#         return templates.TemplateResponse("register.html", {"request": request, "error": e.detail})
-
-# API registration endpoint
 @router.post("/register", status_code=201, summary="Create a new user")
 def register_user(body: UserCreate):
     hashed = hash_password(body.password)
     create_user(body.username, hashed, body.full_name or "")
     return {"message": "User registered successfully"}
 
-
-# # HTML login page (GET)
-# @router.get("/", response_class=HTMLResponse)
-# def login_page(request: Request, error: Optional[str] = None):
-#     return templates.TemplateResponse("login.html", {"request": request, "error": error})
-
-# HTML login form handler (POST)
-# @router.post("/login-html", response_class=HTMLResponse)
-# def login_html(request: Request, username: str = Form(...), password: str = Form(...)):
-#     user = authenticate_user(username, password)
-#     if not user:
-#         return templates.TemplateResponse("login.html", {"request": request, "error": "Invalid credentials"})
-#     return templates.TemplateResponse("success.html", {"request": request})
-
-# API login endpoint
 @router.post("/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
@@ -117,7 +84,3 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     access_token = create_access_token({"sub": user["username"]})
     return {"access_token": access_token, "token_type": "bearer"}
-
-# @router.get("/me", response_model=UserPublic, summary="Get my profile (protected)")
-# def read_me(current_user: UserPublic = Depends(get_current_user)):
-#     return current_user

@@ -1,4 +1,4 @@
-.modal-backdrop {
+.ctm-backdrop {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.15);
@@ -8,7 +8,7 @@
   justify-content: center;
 }
 
-.create-table-modal {
+.ctm-panel {
   background: #fff;
   padding: 32px 32px 24px 32px;
   border-radius: 12px;
@@ -25,19 +25,19 @@
   to { opacity: 1; transform: scale(1);}
 }
 
-.modal-section {
+.ctm-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.modal-label {
+.ctm-label {
   font-weight: 500;
   color: #22223b;
   margin-bottom: 2px;
 }
 
-.modal-input, .modal-select {
+.ctm-input, .ctm-select {
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid #e0e1e3;
@@ -48,7 +48,7 @@
   transition: border 0.2s;
 }
 
-.modal-input:focus, .modal-select:focus {
+.ctm-input:focus, .ctm-select:focus {
   border: 1.5px solid #2563eb;
 }
 
@@ -90,7 +90,7 @@
   color: #b91c1c;
 }
 
-.modal-error {
+.ctm-error {
   color: #dc2626;
   background: #fef2f2;
   border-radius: 5px;
@@ -99,14 +99,14 @@
   font-size: 0.97rem;
 }
 
-.modal-actions {
+.ctm-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 8px;
 }
 
-.modal-btn {
+.ctm-btn {
   padding: 8px 20px;
   border-radius: 6px;
   border: none;
@@ -116,21 +116,21 @@
   transition: background 0.2s, color 0.2s;
 }
 
-.modal-btn.cancel {
+.ctm-btn.cancel {
   background: #f1f5f9;
   color: #22223b;
 }
 
-.modal-btn.cancel:hover {
+.ctm-btn.cancel:hover {
   background: #e0e7ef;
 }
 
-.modal-btn.create {
+.ctm-btn.create {
   background: #2563eb;
   color: #fff;
 }
 
-.modal-btn.create:hover {
+.ctm-btn.create:hover {
   background: #1d4ed8;
 }
 

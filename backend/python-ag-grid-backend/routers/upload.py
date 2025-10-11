@@ -1,22 +1,107 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+import csv, io, itertools
+from db_access.tables_operations import create_table, insert_rows_bulk
+import re
 
 router = APIRouter()
-
-@router.post("/")
-async def upload_file(file: UploadFile = File(...)):
+    
+@router.post("/import-csv")
+def import_csv(file: UploadFile = File(...), table_name: str | None = Form(None), infer_rows: int = Form(50)):
+    """
+    POST multipart/form-data:
+      - file: csv file
+      - table_name (optional): desired table name; fallback to filename
+      - infer_rows (optional): how many rows to sample to infer types
+    """
     try:
-            if not file.filename:
-                raise HTTPException(status_code=400, detail="No file uploaded")
+        content = file.file.read()
+        text = content.decode('utf-8-sig')
+        reader = csv.reader(io.StringIO(text))
+        headers = next(reader, None)
+        if not headers:
+            raise HTTPException(status_code=400, detail="CSV has no header row")
 
-            print(f"Uploaded file: {file.filename}")
+        # sanitize column names
+        cols = [sanitize_identifier(h) for h in headers]
 
-            return {
-                "message": "File uploaded successfully",
-                "filename": file.filename,
-                "content_type": file.content_type,
-                "size": file.size
-            }
+        # optionally table name from form or filename
+        base_name = table_name or (file.filename.rsplit('.', 1)[0] if file.filename else 'imported_table')
+        table = sanitize_identifier(base_name)
 
+        # peek first N rows to infer types
+        sample_rows = list(itertools.islice(reader, infer_rows))
+        # convert the rest to rows list
+        rest_rows = list(reader)
+        all_rows = sample_rows + rest_rows
+
+        # inference helpers
+        def infer_type(values):
+            has_float = False
+            for v in values:
+                if v is None or v == '':
+                    continue
+                v = v.strip()
+                if v.lower() in ('true','false','t','f','0','1'):
+                    continue
+                try:
+                    int(v)
+                    continue
+                except:
+                    try:
+                        float(v)
+                        has_float = True
+                        continue
+                    except:
+                        return "VARCHAR(1024)"
+            if has_float:
+                return "FLOAT"
+            return "INTEGER"
+
+        # build column types using sample
+        transposed = list(zip(*([row + [''] * (len(cols) - len(row)) for row in sample_rows]))) if sample_rows else [[] for _ in cols]
+        col_types = []
+        for i, col in enumerate(cols):
+            values = transposed[i] if i < len(transposed) else []
+            # if values empty -> default VARCHAR
+            if not any(v.strip() for v in values):
+                col_types.append("VARCHAR(1024)")
+            else:
+                inferred = infer_type(values)
+                # treat booleans separately
+                if all((v.strip().lower() in ('true','false','t','f','0','1') or v.strip()=='' ) for v in values):
+                    col_types.append("BOOLEAN")
+                else:
+                    col_types.append(inferred)
+
+        # prepare create_table columns definition for create_table(table_name, columns)
+        create_cols = [{"name": name, "type": typ} for name, typ in zip(cols, col_types)]
+
+        # create table (create_table uses IF NOT EXISTS)
+        create_table(table, create_cols)
+
+        # prepare rows aligned to columns and convert empty to None
+        rows_to_insert = []
+        for row in all_rows:
+            # extend or trim to match cols length
+            row_aligned = [ (cell if cell != '' else None) for cell in (row + [''] * len(cols))[:len(cols)] ]
+            rows_to_insert.append(row_aligned)
+
+        # insert in batches to avoid huge single executemany
+        batch_size = 500
+        for i in range(0, len(rows_to_insert), batch_size):
+            insert_rows_bulk(table, cols, rows_to_insert[i:i+batch_size])
+
+        return {"success": True, "table": table, "rows": len(rows_to_insert), "columns": len(cols)}
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Error uploading file: {str(e)}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+def sanitize_identifier(name: str) -> str:
+    s = re.sub(r'\W+', '_', name).strip('_').lower()
+    if s == '':
+        s = 'col'
+    if re.match(r'^\d', s):
+        s = f'c_{s}'
+    return s

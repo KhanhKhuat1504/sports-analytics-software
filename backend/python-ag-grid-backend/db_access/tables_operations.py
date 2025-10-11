@@ -100,3 +100,17 @@ def get_primary_key_column(table_name):
             """, (table_name,))
             result = cur.fetchone()
             return result["attname"] if result else None
+
+def insert_rows_bulk(table_name: str, columns: list[str], rows: list[list]):
+    """
+    columns: list of column names (already sanitized)
+    rows: list of row-value lists aligned with columns
+    """
+    cols_quoted = ', '.join([f'"{c}"' for c in columns])
+    placeholders = ', '.join(['%s'] * len(columns))
+    sql = f'INSERT INTO "{table_name}" ({cols_quoted}) VALUES ({placeholders})'
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.executemany(sql, rows)
+            conn.commit()
+    return True

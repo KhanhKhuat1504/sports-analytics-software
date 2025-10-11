@@ -8,8 +8,8 @@ interface DeleteTableModalProps {
 }
 
 const DeleteTableModal: React.FC<DeleteTableModalProps> = ({ tableName, onConfirm, onCancel }) => (
-  <div className="modal-backdrop">
-    <div className="modal">
+  <div className="dtm-backdrop">
+    <div className="dtm-panel">
       <h2>Delete Table</h2>
       <p>
         Are you sure you want to delete the table <b>{tableName}</b>?<br />

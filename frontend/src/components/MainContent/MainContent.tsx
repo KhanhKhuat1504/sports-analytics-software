@@ -2,32 +2,30 @@ import React from "react";
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TableCard from "../TableCard/TableCard";
-import AddRowModal from "../Modals/AddRowModal";
+import AddRowModal from "../Modals/TableOperationsModals/AddRowModal";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import "./MainContent.css";
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 ModuleRegistry.registerModules([AllCommunityModule]);
-import ImportCSV from "../ImportCSV/ImportCSV";
-import CreateTableModal from "../Modals/CreateTableModal";
-import DeleteTableModal from "../Modals/DeleteTableModal";
+import ImportCSVButton from "../ImportCSV/ImportCSV";
+import ImportCSVModal from "../Modals/ImportCSVModals/ImportCSVModal";
+import CreateTableButton from "../CreateTable/CreateTable";
+import CreateTableModal from "../Modals/TableOperationsModals/CreateTableModal";
+import DeleteTableModal from "../Modals/TableOperationsModals/DeleteTableModal";
 import { toColumnDefs } from "../../utilities/TableUtilities";
-
-type TableKey = "players" | "matches" | "performance";
 
 const MainContent = () => {
   const [rowData, setRowData] = useState<any[]>([]);
   const [columnDefs, setColumnDefs] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showCreateTableModal, setShowCreateTableModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [newRowData, setNewRowData] = useState<any>({});
   const [addError, setAddError] = useState<string | null>(null);
   const [tableMeta, setTableMeta] = useState<any[]>([]);
   const { selectedTable } = useParams();
-  console.log(rowData);
-  console.log(columnDefs);
-  console.log(tableMeta);
 
   const navigate = useNavigate();
 
@@ -38,8 +36,6 @@ const MainContent = () => {
     floatingFilter: true,
     resizable: true,
   }), []);
-
-  // Inside your MainContent component
 
   const handleAddRow = async () => {
     if (!selectedTable) {
@@ -84,9 +80,6 @@ const MainContent = () => {
   };
 
   const handleDeleteTable = async (tableName: string) => {
-    if (!window.confirm(`Are you sure you want to delete the table "${tableName}"? This action cannot be undone.`)) {
-      return;
-    }
     try {
       const res = await fetch(`http://localhost:5000/api/table/delete-table/${tableName}`, {
         method: "DELETE",
@@ -136,10 +129,17 @@ const MainContent = () => {
           <p>Manage your data tables, schemas, and analytics datasets</p>
         </div>
         <div className="main-header-actions">
-          <ImportCSV/>
-          <button className="create-btn" onClick={() => setShowCreateTableModal(true)}>
-            + Create Table
-          </button>
+          <ImportCSVButton onClick={() => setShowImportModal(true)} />
+          {showImportModal && (
+            <ImportCSVModal
+              onClose={() => setShowImportModal(false)}
+              onSuccess={() => {
+                fetchAllTableMeta();
+                setShowImportModal(false);
+              }}
+            />
+          )}
+          <CreateTableButton onClick={() => setShowCreateTableModal(true)} />
           {showCreateTableModal && (
             <CreateTableModal
               onClose={() => setShowCreateTableModal(false)}
@@ -171,35 +171,14 @@ const MainContent = () => {
                 modified="N/A"
                 by="Admin"
                 onClick={() => navigate(`/tables/${table.key}`)}
+                onDelete={() => setDeleteTarget(table.key)}
               />
-              <button
-                className="delete-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  setDeleteTarget(table.key);
-                }}
-                title="Delete Table"
-              >
-                🗑️
-              </button>
               {deleteTarget && (
                 <DeleteTableModal
                   tableName={deleteTarget}
                   onCancel={() => setDeleteTarget(null)}
-                  onConfirm={async () => {
-                    try {
-                      const res = await fetch(`http://localhost:5000/api/table/delete-table/${deleteTarget}`, {
-                        method: "DELETE",
-                      });
-                      if (!res.ok) {
-                        const errorData = await res.json();
-                        alert(errorData.detail || "Failed to delete table");
-                      } else {
-                        fetchAllTableMeta();
-                      }
-                    } catch {
-                      alert("Network error");
-                    }
+                  onConfirm={() => {
+                    handleDeleteTable(deleteTarget);
                     setDeleteTarget(null);
                   }}
                 />

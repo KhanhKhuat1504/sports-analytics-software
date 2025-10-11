@@ -1,15 +1,17 @@
 import React from "react";
-import Uploady from "@rpldy/uploady";
-import {asUploadButton} from "@rpldy/upload-button";
 
-const ImportButton = asUploadButton((props: React.ComponentProps<'button'>) => {
-	return <button className="import-btn" {...props}>Import CSV</button>
-});
+interface ImportCSVButtonProps {
+  onClick?: () => void;
+  className?: string;
+  label?: string;
+}
 
-const ImportCSV = () => (
-	<Uploady destination={{ url: "http://localhost:5000/api/upload/" }} accept=".csv">
-		<ImportButton/>
-	</Uploady>
-);
+const ImportCSVButton: React.FC<ImportCSVButtonProps> = ({ onClick, className = "import-btn", label = "Import CSV" }) => {
+  return (
+    <button className={className} onClick={onClick} type="button">
+      {label}
+    </button>
+  );
+};
 
-export default ImportCSV;
+export default ImportCSVButton;

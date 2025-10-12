@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from models.models import TableRowUpdateRequest, TableRowAddRequest, CreateTableRequest
-from db_access.tables_operations import get_table_data, get_all_tables_metadata, add_table_row, update_table_row, create_table, delete_table
+from db_access.tables_operations import get_table_data, get_all_tables_metadata, add_table_row, update_table_row, create_table, delete_table, get_primary_key_column
 
 router = APIRouter()
 #TODO:  handle edge cases for endpoints and add delete row endpoint
@@ -25,6 +25,14 @@ def delete_table_endpoint(table_name: str):
     try:
         delete_table(table_name)
         return {"success": True, "message": f"Table '{table_name}' deleted."}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+@router.get("/primary-key/{table_name}")
+def get_primary_key_endpoint(table_name: str):
+    try:
+        primary_key = get_primary_key_column(table_name)
+        return {"primary_key": primary_key}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

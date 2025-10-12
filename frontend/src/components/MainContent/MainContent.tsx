@@ -18,6 +18,7 @@ import { toColumnDefs } from "../../utilities/TableUtilities";
 const MainContent = () => {
   const [rowData, setRowData] = useState<any[]>([]);
   const [columnDefs, setColumnDefs] = useState<any[]>([]);
+  const [requiredColumns, setRequiredColumns] = useState<string[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showCreateTableModal, setShowCreateTableModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -93,6 +94,27 @@ const MainContent = () => {
       fetchAllTableMeta();
     } catch (err) {
       alert("Network error");
+    }
+  };
+
+  const openAddRowModal = async () => {
+    if (!selectedTable) {
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:5000/api/table/primary-key/${selectedTable}`);
+      if (!res.ok) throw new Error("failed to fetch primary key");
+      const data = await res.json();
+      // backend may return a string or an array
+      const pk = data.primary_key;
+      const pks = Array.isArray(pk) ? pk : (pk ? [pk] : []);
+      setRequiredColumns(pks.length ? pks : []);
+      setNewRowData((prev: { [x: string]: any; }) => ({ ...prev, ...Object.fromEntries(pks.map(k => [k, prev[k] ?? ""])) }));
+    } catch (err) {
+      console.error("Error fetching primary key:", err);
+      // fallback behavior
+    } finally {
+      setShowAddModal(true);
     }
   };
 
@@ -192,7 +214,7 @@ const MainContent = () => {
             ← Back to Tables
           </button>
           {selectedTable && (
-            <button onClick={() => setShowAddModal(true)} style={{ marginBottom: 16 }}>
+            <button onClick={openAddRowModal} style={{ marginBottom: 16 }}>
               + Add Row
             </button>
           )}
@@ -207,13 +229,17 @@ const MainContent = () => {
           {showAddModal && (
             <AddRowModal
               columnDefs={columnDefs}
-              requiredColumns={["id"]}
+              requiredColumns={requiredColumns}
               newRowData={newRowData}
               setNewRowData={setNewRowData}
-              onAdd={handleAddRow}
+              onAdd={async () => {
+                await handleAddRow();
+                setRequiredColumns([]);
+              }}
               onCancel={() => {
                 setShowAddModal(false);
                 setNewRowData({});
+                setRequiredColumns([]);
               }}
               addError={addError}
             />

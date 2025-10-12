@@ -1,5 +1,5 @@
 // AddRowModal.tsx
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import "./AddRowModal.css";
 
 interface AddRowModalProps {
@@ -8,7 +8,7 @@ interface AddRowModalProps {
   setNewRowData: (data: any) => void;
   onAdd: () => void;
   onCancel: () => void;
-  requiredColumns: string[];
+  requiredColumns?: string[];
   addError?: string | null;
 }
 
@@ -18,10 +18,17 @@ const AddRowModal: React.FC<AddRowModalProps> = ({
   setNewRowData,
   onAdd,
   onCancel,
-  requiredColumns,
+  requiredColumns = [],
   addError = null,
 }) => {
   const [missingRequiredFieldsError, setMissingRequiredFieldsError] = useState<string | null>(null);
+
+  const hasMissingRequiredFields = useMemo(() => {
+    return requiredColumns.some((field) => {
+      const val = newRowData?.[field];
+      return (val === undefined || val === null || String(val).trim() === "");
+    });
+  }, [requiredColumns, newRowData]);
 
   const handleMissingRequiredFields = () => {
     for (const field of requiredColumns) {
@@ -59,7 +66,14 @@ const AddRowModal: React.FC<AddRowModalProps> = ({
         {addError && <div style={{ color: "red", marginBottom: 12 }}>{addError}</div>}
         <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end" }}>
           <button onClick={onCancel} style={{ marginRight: 12 }}>Cancel</button>
-          <button onClick={handleMissingRequiredFields} style={{ background: "#22c55e", color: "#fff" }}>Add</button>
+          <button
+            onClick={handleMissingRequiredFields}
+            style={{ background: "#22c55e", color: "#fff" }}
+            disabled={hasMissingRequiredFields}
+            title={hasMissingRequiredFields ? "Fill required fields" : "Add"}
+          >
+            Add
+          </button>
         </div>
       </div>
     </div>

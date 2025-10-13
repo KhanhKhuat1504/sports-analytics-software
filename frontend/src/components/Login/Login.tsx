@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Login.css";
 
 function Login() {
-//     VIBE CODE DO NOT USE
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -36,7 +36,7 @@ function Login() {
                 localStorage.setItem("token", data.access_token)
                 localStorage.setItem("token-type", data.token_type)
 
-                navigate("/")
+                navigate("/tables")
             } else {
                 setError(data.error || 'Login failed');
             }
@@ -47,7 +47,6 @@ function Login() {
         }
     };
 
-// STYLING USES BOOTSTRAP
     return(
         <div className="container d-flex justify-content-center align-items-center vh-100">
             <div className="card shadow-md">
@@ -84,14 +83,9 @@ function Login() {
                             {loading ? 'Loading...' : 'Login'}
                         </button>
                     </form>
-                    {error && (
-                        <div className="alert alert-danger mt-3 mb-0" role="alert">
-                            {error}
-                        </div>
-                    )}
                     <hr className="my-3" />
                     <p className="text-center mb-0">
-                        Don't have an account? <Link to="/register">Register here</Link>
+                        Don't have an account? <Link to="/register">Login here</Link>
                     </p>
                 </div>
             </div>

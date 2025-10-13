@@ -1,111 +1,146 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Register.css';
 
 
 function Register() {
-// VIBE CODE
-    const [username, setUsername] = useState('');
-        const [password, setPassword] = useState('');
-        const [full_name, setFullName] = useState('');
-        const [loading, setLoading] = useState(false);
-        const [error, setError] = useState('');
-        const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
-        const handleSubmit = async (e) => {
-            e.preventDefault();
-            setError('');
-            setSuccess('');
-            setLoading(true);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors }
+    } = useForm();
 
-            try {
-                // Replace this URL with your actual API endpoint
-                const response = await fetch('http://localhost:5000/api/login/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username,
-                        password,
-                        full_name
-                    }),
-                });
+    const onSubmit = async (formData) => {
+        setError('');
+        setSuccess('');
+        setLoading(true);
 
-                const data = await response.json();
+        try {
+            const response = await fetch('http://localhost:5000/api/login/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: formData.username,
+                    password: formData.password,
+                    full_name: formData.full_name
+                }),
+            });
 
-                if (!response.ok) {
-                    throw new Error(data.message || 'Registration failed');
-                }
+            const data = await response.json();
 
-                setSuccess('Registration successful!');
-                // Optional: redirect to login or dashboard
-                // window.location.href = '/login';
-
-            } catch (err) {
-                setError(err.message || 'An error occurred during registration');
-            } finally {
-                setLoading(false);
+            if (!response.ok) {
+                throw new Error(data.message || 'Registration failed');
             }
-        };
 
-// USES BOOTSTRAP STYLING
-    return(
+            setSuccess('Registration successful!');
+
+        } catch (err) {
+            setError(err.message || 'An error occurred during registration');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
         <div className="container d-flex justify-content-center align-items-center vh-100">
-                    <div className="card shadow-md">
-                        <div className="card-body p-4">
-                            <h2 className="text-center mb-3">Register</h2>
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-3">
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="username"
-                                        placeholder="Username"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        required
-                                        />
-                                </div>
-                                <div className="mb-3">
-                                    <input
-                                        type="password"
-                                        className="form-control"
-                                        name="password"
-                                        placeholder="Password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                     <input
-                                         type="full_name"
-                                         className="form-control"
-                                         name="full_name"
-                                         placeholder="Full Name"
-                                         value={full_name}
-                                         onChange={(e) => setFullName(e.target.value)}
-                                         required
-                                     />
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="btn btn-primary w-100"
-                                    disabled={loading}
-                                >
-                                    {loading ? 'Loading...' : 'Register'}
-                                </button>
-                            </form>
-                            <hr className="my-3" />
-                            <p className="text-center mb-0">
-                                Already have an account? <Link to="/">Login here</Link>
-                            </p>
+            <div className="card shadow-md">
+                <div className="card-body p-4">
+                    <h2 className="text-center mb-3">Register</h2>
+
+                    {error && (
+                        <div className="alert alert-danger" role="alert">
+                            {error}
                         </div>
-                    </div>
+                    )}
+
+                    {success && (
+                        <div className="alert alert-success" role="alert">
+                            {success}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <div className="mb-3">
+                            <input
+                                type="text"
+                                className={`form-control ${errors.username ? 'is-invalid' : ''}`}
+                                placeholder="Username"
+                                {...register("username", {
+                                    required: "Username is required",
+                                    minLength: {
+                                        value: 3,
+                                        message: "Username must be at least 3 characters"
+                                    },
+                                    maxLength: {
+                                        value:20,
+                                        message: "Username must be less than 20 characters"
+                                    }
+                                })}
+                            />
+                            {errors.username && (
+                                <div className="invalid-feedback">
+                                    {errors.username.message}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="mb-3">
+                            <input
+                                type="password"
+                                className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                                placeholder="Password"
+                                {...register("password", {
+                                    required: "Password is required",
+                                    minLength: {
+                                        value: 6,
+                                        message: "Password must be at least 6 characters"
+                                    },
+                                    pattern: {
+                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                                        message: "Password must contain uppercase, lowercase, and number"
+                                    }
+                                })}
+                            />
+                            {errors.password && (
+                                <div className="invalid-feedback">
+                                    {errors.password.message}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="mb-3">
+                            <input
+                                type="text"
+                                className={`form-control`}
+                                placeholder="Full Name"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="btn btn-primary w-100"
+                            disabled={loading}
+                        >
+                            {loading ? 'Loading...' : 'Register'}
+                        </button>
+                    </form>
+
+                    <hr className="my-3" />
+                    <p className="text-center mb-0">
+                        Already have an account? <Link to="/">Login here</Link>
+                    </p>
                 </div>
-        );
+            </div>
+        </div>
+    );
 }
 
 export default Register;

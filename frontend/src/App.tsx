@@ -1,35 +1,40 @@
-import { AuthProvider } from './contexts/AuthContext';
-import { StrictMode } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { StrictMode } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainContent from "./components/MainContent/MainContent";
 import NavBar from "./components/NavBar/NavBar";
-import AppLayout from './components/AppLayout/AppLayout';
-import Login from './components/Login/Login';
-import Register from './components/Register/Register';
-import Dashboard from "./pages/Dashboard";
-import "./App.css";
-
+import AppLayout from "./components/AppLayout/AppLayout";
+import Login from "./components/Login/Login";
+import Register from "./components/Register/Register";
+import Dashboard from "./components/Dashboard/Dashboard";
+import "./index.css";
 
 function App() {
-  return (
-      <StrictMode>
-        <Router>
-            <AuthProvider>
-                {/* <NavBar /> */}
-                <Routes>
-                    <Route path="/" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route element={<AppLayout />}>
-                        <Route path="/tables" element={<MainContent />} />
-                        <Route path="/tables/:selectedTable" element={<MainContent />} />
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/ai-assistant" element={<div>Test AI Assistant Route</div>} />
-                    </Route>
-                </Routes>
-            </AuthProvider>
-        </Router>
-    </StrictMode>
-  );
+    return (
+        <StrictMode>
+            <Router>
+                <AuthProvider>
+                    {/* <NavBar /> */}
+                    <Routes>
+                        <Route path="/" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route element={<AppLayout />}>
+                            <Route path="/tables" element={<MainContent />} />
+                            <Route
+                                path="/tables/:selectedTable"
+                                element={<MainContent />}
+                            />
+                            <Route path="/dashboard" element={<Dashboard />} />
+                            <Route
+                                path="/ai-assistant"
+                                element={<div>Test AI Assistant Route</div>}
+                            />
+                        </Route>
+                    </Routes>
+                </AuthProvider>
+            </Router>
+        </StrictMode>
+    );
 }
 
 export default App;

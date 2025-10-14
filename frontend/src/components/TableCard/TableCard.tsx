@@ -11,6 +11,7 @@ interface TableCardProps {
   modified: string;
   by: string;
   onClick?: () => void;
+  onDelete?: () => void;
 }
 
 const TableCard: React.FC<TableCardProps> = ({
@@ -23,27 +24,40 @@ const TableCard: React.FC<TableCardProps> = ({
   modified,
   by,
   onClick,
-}) => (
-  <div className="table-card" onClick={onClick} style={{ cursor: onClick ? "pointer" : "default" }}>
-    <div className="table-card-header">
-      <span className="table-icon">📋</span>
-      <span className={`table-tag ${tagColor}`}>{tag}</span>
+  onDelete,
+}) => {
+  return (
+    <div className="table-card" onClick={onClick} style={{ cursor: onClick ? "pointer" : "default" }}>
+      <div className="table-card-header">
+        <span className="table-icon">📝</span>
+        <span className={`table-tag ${tagColor}`}>{tag}</span>
+      </div>
+      <h3>{title}</h3>
+      <p className="table-desc">{description}</p>
+      <div className="table-meta">
+        <span>
+          Rows <b>{rows.toLocaleString()}</b>
+        </span>
+        <span>
+          Columns <b>{columns}</b>
+        </span>
+      </div>
+      <div className="table-footer">
+        <span>Modified {modified}</span>
+        <span>by {by}</span>
+      </div>
+      {onDelete && (
+        <button
+          className="delete-btn"
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          title="Delete Table"
+          type="button"
+        >
+          🗑️
+        </button>
+      )}
     </div>
-    <h3>{title}</h3>
-    <p className="table-desc">{description}</p>
-    <div className="table-meta">
-      <span>
-        Rows <b>{rows.toLocaleString()}</b>
-      </span>
-      <span>
-        Columns <b>{columns}</b>
-      </span>
-    </div>
-    <div className="table-footer">
-      <span>Modified {modified}</span>
-      <span>by {by}</span>
-    </div>
-  </div>
-);
+  );
+};
 
 export default TableCard;

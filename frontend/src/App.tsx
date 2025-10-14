@@ -1,22 +1,35 @@
-import React from "react";
-import Sidebar from "./components/Sidebar/Sidebar";
+import { AuthProvider } from './contexts/AuthContext';
+import { StrictMode } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import MainContent from "./components/MainContent/MainContent";
+import NavBar from "./components/NavBar/NavBar";
+import AppLayout from './components/AppLayout/AppLayout';
+import Login from './components/Login/Login';
+import Register from './components/Register/Register';
 import Dashboard from "./pages/Dashboard";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 
+
 function App() {
-    return (
+  return (
+      <StrictMode>
         <Router>
-            <div className="app-layout">
-                <Sidebar />
+            <AuthProvider>
+                {/* <NavBar /> */}
                 <Routes>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/*" element={<MainContent />} />
+                    <Route path="/" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route element={<AppLayout />}>
+                        <Route path="/tables" element={<MainContent />} />
+                        <Route path="/tables/:selectedTable" element={<MainContent />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/ai-assistant" element={<div>Test AI Assistant Route</div>} />
+                    </Route>
                 </Routes>
-            </div>
+            </AuthProvider>
         </Router>
-    );
+    </StrictMode>
+  );
 }
 
 export default App;

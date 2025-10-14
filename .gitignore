@@ -66,3 +66,14 @@ jspm_packages/
 *.iml
 *.ipr
 *.iws
+.gradio 
+.venv 
+node_modules 
+package-lock.json
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.idea

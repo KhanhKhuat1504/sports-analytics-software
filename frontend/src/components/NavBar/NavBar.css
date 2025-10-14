@@ -1,0 +1,15 @@
+.team-select {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #e0e1e3;
+  background: #f7f8fa;
+  font-size: 1rem;
+  color: #22223b;
+  outline: none;
+  min-width: 140px;
+}
+.username {
+  font-size: 1rem;
+  color: #22223b;
+  font-weight: 500;
+}

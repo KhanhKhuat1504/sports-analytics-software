@@ -1,33 +1,67 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
-import { Link } from "react-router-dom";
 
 const Sidebar = () => (
   <aside className="sidebar">
-    <div className="sidebar-header">
+    <NavLink
+      to="/"
+      className="sidebar-header"
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
       <h2>
         SportsAnalytics <span className="ai">AI</span>
       </h2>
       <p className="powered">Powered by conversational analytics</p>
-    </div>
+    </NavLink>
+
     <div className="sidebar-section">
       <div className="teams-view">
-        <span className="globe">🌐</span>
+        <span className="globe">🔎</span>
         <div>
           <div className="teams-title">All Teams View</div>
           <div className="teams-desc">Complete NBA overview</div>
         </div>
       </div>
+
       <nav>
         <ul>
-          <li>AI Assistant</li>
-          <li className="active">Tables</li>
           <li>
-            <Link to="/dashboard">Analytics Dashboard</Link>
+            <NavLink
+              to="/ai-assistant"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              AI Assistant
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/tables"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Tables
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Analytics Dashboard
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              Home
+            </NavLink>
           </li>
         </ul>
       </nav>
     </div>
+
     <div className="sidebar-footer">
       <div className="try-asking">
         <b>💡 Try asking:</b>

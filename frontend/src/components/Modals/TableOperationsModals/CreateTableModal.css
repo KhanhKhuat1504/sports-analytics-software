@@ -1,0 +1,141 @@
+.ctm-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.15);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ctm-panel {
+  background: #fff;
+  padding: 32px 32px 24px 32px;
+  border-radius: 12px;
+  min-width: 380px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: fadeInPanel 0.2s;
+}
+
+@keyframes fadeInPanel {
+  from { opacity: 0; transform: scale(0.97);}
+  to { opacity: 1; transform: scale(1);}
+}
+
+.ctm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ctm-label {
+  font-weight: 500;
+  color: #22223b;
+  margin-bottom: 2px;
+}
+
+.ctm-input, .ctm-select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e1e3;
+  background: #f7f8fa;
+  font-size: 1rem;
+  color: #22223b;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.ctm-input:focus, .ctm-select:focus {
+  border: 1.5px solid #2563eb;
+}
+
+.column-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.add-col-btn {
+  margin-top: 6px;
+  background: #f1f5f9;
+  color: #2563eb;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-col-btn:hover {
+  background: #e0e7ef;
+}
+
+.remove-col-btn {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0 6px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.remove-col-btn:hover {
+  color: #b91c1c;
+}
+
+.ctm-error {
+  color: #dc2626;
+  background: #fef2f2;
+  border-radius: 5px;
+  padding: 7px 12px;
+  margin-top: 2px;
+  font-size: 0.97rem;
+}
+
+.ctm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.ctm-btn {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.ctm-btn.cancel {
+  background: #f1f5f9;
+  color: #22223b;
+}
+
+.ctm-btn.cancel:hover {
+  background: #e0e7ef;
+}
+
+.ctm-btn.create {
+  background: #2563eb;
+  color: #fff;
+}
+
+.ctm-btn.create:hover {
+  background: #1d4ed8;
+}
+
+.columns-list {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 6px;
+}

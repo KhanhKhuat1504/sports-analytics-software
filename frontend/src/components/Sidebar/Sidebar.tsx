@@ -1,5 +1,6 @@
 import React from "react";
 import "./Sidebar.css";
+import { Link } from "react-router-dom";
 
 const Sidebar = () => (
   <aside className="sidebar">
@@ -21,7 +22,9 @@ const Sidebar = () => (
         <ul>
           <li>AI Assistant</li>
           <li className="active">Tables</li>
-          <li>Analytics Dashboard</li>
+          <li>
+            <Link to="/dashboard">Analytics Dashboard</Link>
+          </li>
         </ul>
       </nav>
     </div>

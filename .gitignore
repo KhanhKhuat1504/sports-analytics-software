@@ -1,1 +1,68 @@
-.idea
+# Python virtual environment
+venv/
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+*.out
+*.err
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE-specific files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+out/
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+*.patch
+
+# Dependency directories
+bower_components/
+jspm_packages/
+
+# Miscellaneous
+*.lock
+*.gz
+*.zip
+*.tar
+*.tgz
+*.7z
+*.rar
+*.pyc
+*.pyo
+*.pyd
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.ipr
+*.iws

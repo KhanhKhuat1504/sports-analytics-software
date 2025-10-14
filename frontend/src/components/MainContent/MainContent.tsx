@@ -27,6 +27,7 @@ const MainContent = () => {
   const [addError, setAddError] = useState<string | null>(null);
   const [tableMeta, setTableMeta] = useState<any[]>([]);
   const { selectedTable } = useParams();
+  console.log(columnDefs);
 
   const navigate = useNavigate();
 
@@ -101,21 +102,7 @@ const MainContent = () => {
     if (!selectedTable) {
       return;
     }
-    try {
-      const res = await fetch(`http://localhost:5000/api/table/primary-key/${selectedTable}`);
-      if (!res.ok) throw new Error("failed to fetch primary key");
-      const data = await res.json();
-      // backend may return a string or an array
-      const pk = data.primary_key;
-      const pks = Array.isArray(pk) ? pk : (pk ? [pk] : []);
-      setRequiredColumns(pks.length ? pks : []);
-      setNewRowData((prev: { [x: string]: any; }) => ({ ...prev, ...Object.fromEntries(pks.map(k => [k, prev[k] ?? ""])) }));
-    } catch (err) {
-      console.error("Error fetching primary key:", err);
-      // fallback behavior
-    } finally {
-      setShowAddModal(true);
-    }
+    setShowAddModal(true);
   };
 
   const fetchAllTableMeta = () => {
@@ -125,18 +112,38 @@ const MainContent = () => {
   };
 
   useEffect(() => {
+    if (!selectedTable) {
+      setRequiredColumns([]);
+      return;
+    }
+    // Fetch primary key(s) when table changes
+    fetch(`http://localhost:5000/api/table/primary-key/${selectedTable}`)
+      .then(res => res.ok ? res.json() : Promise.reject("failed to fetch primary key"))
+      .then(data => {
+        const pk = data.primary_key;
+        const pks = Array.isArray(pk) ? pk : (pk ? [pk] : []);
+        setRequiredColumns(pks.length ? pks : []);
+        setNewRowData((prev: { [x: string]: any; }) => ({ ...prev, ...Object.fromEntries(pks.map(k => [k, prev[k] ?? ""])) }));
+      })
+      .catch(err => {
+        console.error("Error fetching primary key:", err);
+        setRequiredColumns([]);
+      });
+  }, [selectedTable]);
+
+  useEffect(() => {
     if (selectedTable) {
       fetch(`http://localhost:5000/api/table/${selectedTable}`)
         .then((res) => res.json())
         .then((data) => {
           setRowData(data.rows);
-          setColumnDefs(toColumnDefs(data.columns));
+          setColumnDefs(toColumnDefs(data.columns, requiredColumns));
         });
     } else {
       setRowData([]);
       setColumnDefs([]);
     }
-  }, [selectedTable]);
+  }, [selectedTable, requiredColumns]);
 
   useEffect(() => {
     fetchAllTableMeta();

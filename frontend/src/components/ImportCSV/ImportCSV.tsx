@@ -6,7 +6,7 @@ interface ImportCSVButtonProps {
   label?: string;
 }
 
-const ImportCSVButton: React.FC<ImportCSVButtonProps> = ({ onClick, className = "import-btn", label = "Import CSV" }) => {
+const ImportCSVButton: React.FC<ImportCSVButtonProps> = ({ onClick, className = "import-btn", label = "Create Table from CSV" }) => {
   return (
     <button className={className} onClick={onClick} type="button">
       {label}

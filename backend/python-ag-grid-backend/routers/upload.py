@@ -1,12 +1,14 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 import csv, io, itertools
+
+from flask import json
 from db_access.tables_operations import create_table, insert_rows_bulk
 import re
 
 router = APIRouter()
     
 @router.post("/import-csv")
-def import_csv(file: UploadFile = File(...), table_name: str | None = Form(None), infer_rows: int = Form(50)):
+def import_csv(file: UploadFile = File(...), primary_keys: str = Form(None), table_name: str | None = Form(None), infer_rows: int = Form(50)):
     """
     POST multipart/form-data:
       - file: csv file
@@ -27,6 +29,23 @@ def import_csv(file: UploadFile = File(...), table_name: str | None = Form(None)
         # optionally table name from form or filename
         base_name = table_name or (file.filename.rsplit('.', 1)[0] if file.filename else 'imported_table')
         table = sanitize_identifier(base_name)
+
+        # Parse primary_keys from form
+        if primary_keys:
+            try:
+                # Try to parse as JSON array first
+                pk_list = json.loads(primary_keys)
+                if not isinstance(pk_list, list):
+                    raise ValueError
+                pk_set = set([sanitize_identifier(pk) for pk in pk_list])
+            except Exception:
+                # Fallback: comma-separated string
+                pk_set = set([sanitize_identifier(pk.strip()) for pk in primary_keys.split(",") if pk.strip()])
+        else:
+            pk_set = set()
+
+        if not pk_set:
+            raise HTTPException(status_code=400, detail="You must select at least one primary key column.")
 
         # peek first N rows to infer types
         sample_rows = list(itertools.islice(reader, infer_rows))
@@ -74,7 +93,10 @@ def import_csv(file: UploadFile = File(...), table_name: str | None = Form(None)
                     col_types.append(inferred)
 
         # prepare create_table columns definition for create_table(table_name, columns)
-        create_cols = [{"name": name, "type": typ} for name, typ in zip(cols, col_types)]
+        create_cols = [
+            {"name": name, "type": typ, "isPrimary": "true" if name in pk_set else "false"}
+            for name, typ in zip(cols, col_types)
+        ]
 
         # create table (create_table uses IF NOT EXISTS)
         create_table(table, create_cols)

@@ -37,10 +37,41 @@ def update_table_row(table_name, row):
 # need to check for the case when there are more than 1 primary keys input by users
 def create_table(table_name, columns):
     """
-    columns: List of dicts, e.g. [{"name": "id", "type": "SERIAL PRIMARY KEY"}, ...]
+    columns: List of dicts, e.g. [{"name": "id", "type": "SERIAL", "isPrimary": True}, ...]
     """
-    columns_sql = ", ".join([f"{col['name']} {col['type']}" for col in columns])
+    for col in columns:
+        if "isPrimary" in col:
+            col["isPrimary"] = str(col["isPrimary"]).lower() == "true"
+    # Find all columns marked as primary key
+    pk_columns = [col["name"] for col in columns if col.get("isPrimary")]
+    if not pk_columns:
+        raise ValueError("At least one column must be defined as PRIMARY KEY.")
+
+    # Remove PRIMARY KEY from type if present (to avoid duplicate PK in composite case)
+    def clean_type(col):
+        t = col["type"].replace("PRIMARY KEY", "").strip()
+        return t
+
+    columns_sql_parts = []
+    for col in columns:
+        col_def = f'"{col["name"]}" {clean_type(col)}'
+        columns_sql_parts.append(col_def)
+
+    # Add PRIMARY KEY constraint (supports composite keys)
+    if len(pk_columns) == 1:
+        # If only one PK, can append PRIMARY KEY to its type for SERIAL, else add constraint
+        idx = next(i for i, col in enumerate(columns) if col.get("isPrimary"))
+        if "SERIAL" in columns[idx]["type"].upper():
+            columns_sql_parts[idx] = f'"{columns[idx]["name"]}" SERIAL PRIMARY KEY'
+        else:
+            columns_sql_parts.append(f'PRIMARY KEY ("{pk_columns[0]}")')
+    else:
+        pk_fields = ', '.join([f'"{name}"' for name in pk_columns])
+        columns_sql_parts.append(f'PRIMARY KEY ({pk_fields})')
+
+    columns_sql = ", ".join(columns_sql_parts)
     sql = f'CREATE TABLE IF NOT EXISTS "{table_name}" ({columns_sql});'
+
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(sql)
@@ -89,18 +120,6 @@ def get_all_tables_metadata():
                 })
             return result
         
-def get_primary_key_column(table_name):
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT a.attname
-                FROM pg_index i
-                JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
-                WHERE i.indrelid = %s::regclass AND i.indisprimary
-            """, (table_name,))
-            result = cur.fetchone()
-            return result["attname"] if result else None
-
 def insert_rows_bulk(table_name: str, columns: list[str], rows: list[list]):
     """
     columns: list of column names (already sanitized)
@@ -114,3 +133,15 @@ def insert_rows_bulk(table_name: str, columns: list[str], rows: list[list]):
             cur.executemany(sql, rows)
             conn.commit()
     return True
+        
+def get_primary_key_column(table_name):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT a.attname
+                FROM pg_index i
+                JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+                WHERE i.indrelid = %s::regclass AND i.indisprimary
+            """, (table_name,))
+            result = cur.fetchone()
+            return result["attname"] if result else None

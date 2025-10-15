@@ -2,21 +2,28 @@ import React from 'react';
 import './CreateTeam.css';
 
 interface CreateTeamButtonProps {
-    onClick:() => void;
+    onClick: () => void;
     className?: string;
-    label?:string;
+    label?: string;
     children?: React.ReactNode;
+    type?: "button" | "submit" | "reset";
+    disabled?: boolean;
 }
 
 const CreateTeamButton: React.FC<CreateTeamButtonProps> = ({
-    onClick, 
-    className = 'create-team-btn', 
-    label = 'Create Team', 
-    children 
+    onClick,
+    className = '',
+    label = 'Create Team',
+    children,
+    type = 'button',
+    disabled = false,
 }) => (
-    <button 
-    className={'create-team-btn' + (className ? ' ' + className : '')} 
-    onClick={onClick}>
+    <button
+        type={type}
+        className={`create-team-btn${className ? ' ' + className : ''}`}
+        onClick={onClick}
+        disabled={disabled}
+    >
         {children ? children : label}
     </button>
 );

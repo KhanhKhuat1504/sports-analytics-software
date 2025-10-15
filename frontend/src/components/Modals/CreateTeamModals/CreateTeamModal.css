@@ -1,9 +1,9 @@
 .create-team-overlay {
     position: fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0;
     background: rgba(0,0,0,0.15);
     z-index: 1000;
     display: flex;
@@ -42,6 +42,7 @@
     border: 1px solid #ccc;
     width: 100%;
     box-sizing: border-box;
+    font-family: inherit;
 }
 
 .create-team-actions {
@@ -67,7 +68,7 @@
     filter: grayscale(0.2);
 }
 
-.create-team-button:hover:not(:disabled){
+.create-team-button:hover:not(:disabled) {
     background: #2563eb;
 }
 
@@ -93,7 +94,7 @@
         transform: scale(0.95);
     }
     to {
-            opacity: 1;
-            transform: scale(1);
-        }
+        opacity: 1;
+        transform: scale(1);
     }
+}

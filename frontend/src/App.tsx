@@ -26,7 +26,11 @@ function App() {
                             <Route path="/dashboard" element={<Dashboard />} />
                             <Route
                                 path="/ai-assistant"
-                                element={<div>Test AI Assistant Route</div>}
+                                element={<div>Test AI Assistant Route</div>}                              
+                            />
+                            <Route
+                                path="/home"
+                                element={<div>Create Team</div>}                              
                             />
                         </Route>
                     </Routes>

@@ -1,12 +1,13 @@
 # backend/app.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv  # <-- add
-
-load_dotenv()  # <-- loads backend/.env at startup
+from dotenv import load_dotenv
+from python_ag_grid_backend.routers import tables, upload, login
+import gradio as gr
+from python_ag_grid_backend.chatbot_backend import assistant
 from metabase_embed import router as metabase_router
 
-# from superset_embed import router as superset_router
+load_dotenv()
 
 app = FastAPI()
 app.add_middleware(
@@ -23,5 +24,8 @@ def healthz():
     return {"ok": True}
 
 
-# app.include_router(superset_router)
 app.include_router(metabase_router)
+app.include_router(tables.router, prefix="/api/table", tags=["tables"])
+app.include_router(upload.router, prefix="/api/upload", tags=["upload"])
+app.include_router(login.router, prefix="/api/login", tags=["login"])
+app = gr.mount_gradio_app(app, assistant.ui, path="/ai-assistant", show_api=False)

@@ -1,64 +1,87 @@
 import React, { useEffect, useState } from "react";
 
 const Dashboard: React.FC = () => {
-    const [embedUrl, setEmbedUrl] = useState<string | null>(null);
+    const [embedUrl, setEmbedUrl] = useState<string | null>(
+        sessionStorage.getItem("metabaseEmbedUrl")
+    );
     const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(!embedUrl);
 
     useEffect(() => {
         let cancelled = false;
 
-        (async () => {
+        const fetchEmbedUrl = async () => {
             try {
-                const resp = await fetch(
-                    "http://localhost:5000/api/metabase/embed"
-                );
+                const expiry =
+                    Number(sessionStorage.getItem("metabaseUrlExpiry")) || 0;
+                const stillValid = Date.now() < expiry;
+
+                if (embedUrl && stillValid) {
+                    setLoading(false);
+                    return;
+                }
+
+                const resp = await fetch("/api/metabase/embed");
                 if (!resp.ok)
                     throw new Error("Failed to fetch Metabase embed URL");
 
                 const data = await resp.json();
                 if (cancelled) return;
 
+                const expiresInMs = 10 * 60 * 1000; // 10 min
+                const expiryTime = Date.now() + expiresInMs;
+
                 setEmbedUrl(data.url);
+                sessionStorage.setItem("metabaseEmbedUrl", data.url);
+                sessionStorage.setItem("metabaseUrlExpiry", String(expiryTime));
             } catch (err: any) {
                 setError(err?.message ?? String(err));
+            } finally {
+                setLoading(false);
             }
-        })();
+        };
+
+        fetchEmbedUrl();
 
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [embedUrl]);
+
+    if (error) return <p style={{ color: "crimson" }}>Error: {error}</p>;
+    if (loading) return <p>Loading dashboard…</p>;
 
     return (
         <div
             style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                width: "100vw",
-                height: "100vh",
-                overflow: "hidden",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                margin: 0,
+                padding: 0,
                 backgroundColor: "#f9fafb",
+                overflow: "hidden",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
             }}
         >
-            {error && <p style={{ color: "crimson" }}>Error: {error}</p>}
-
-            {embedUrl ? (
+            {embedUrl && (
                 <iframe
                     src={embedUrl}
                     title="Metabase Dashboard"
                     style={{
-                        flex: 1,
-                        width: "90%",
+                        width: "100%",
                         height: "100%",
                         border: "none",
-                        borderRadius: "12px",
-                        boxShadow: "0 0 8px rgba(0,0,0,0.1)",
+                        display: "block",
+                        backgroundColor: "#fff",
                     }}
+                    scrolling="no"
                     allowTransparency={true}
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                 />
-            ) : (
-                <p>Loading dashboard…</p>
             )}
         </div>
     );

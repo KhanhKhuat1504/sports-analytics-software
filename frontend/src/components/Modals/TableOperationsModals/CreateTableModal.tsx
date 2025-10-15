@@ -108,7 +108,7 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({ onClose, onSuccess 
                     checked={col.isPrimary === "true"}
                     onChange={e => handlePrimaryChange(idx, e.target.checked)}
                   />{" "}
-                  Primary Key
+                  Primary Column
                 </label>
                 {columns.length > 1 && (
                   <button

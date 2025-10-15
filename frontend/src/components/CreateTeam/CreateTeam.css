@@ -1,0 +1,15 @@
+.create-team-btn{
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.create-team-btn:hover{
+    background-color: #2563eb;
+}

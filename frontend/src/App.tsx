@@ -7,6 +7,7 @@ import AppLayout from "./components/AppLayout/AppLayout";
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Dashboard from "./components/Dashboard/Dashboard";
+import AssistantFrame from "./components/Assistant/Assistant";
 
 function App() {
     return (
@@ -26,7 +27,7 @@ function App() {
                             <Route path="/dashboard" element={<Dashboard />} />
                             <Route
                                 path="/ai-assistant"
-                                element={<div>Test AI Assistant Route</div>}                              
+                                element={<AssistantFrame/>}                              
                             />
                             <Route
                                 path="/home"

@@ -5,3 +5,8 @@
   font-family: 'Segoe UI', Arial, sans-serif;
   background: #f7f9fb;
 }
+
+.sidebar-wrapper {
+  height: calc(100vh - var(--navbar-height));
+  top: var(--navbar-height);
+}

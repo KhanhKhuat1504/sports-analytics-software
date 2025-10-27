@@ -12,10 +12,10 @@ function AppLayout() {
           <NavBar />
         </div>
         <div className="row">
-          <div className="col-md-3 col-lg-2 p-0">
+          <div className="col-md-3 col-lg-2 p-0 position-fixed overflow-auto sidebar-wrapper">
             <Sidebar />
           </div>
-          <div className="col-md-9 col-lg-10">
+          <div className="col-md-9 offset-2 col-lg-10 overflow-auto">
             <Outlet />
           </div>
         </div>

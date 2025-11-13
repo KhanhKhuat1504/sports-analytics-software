@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Login.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const { setToken } = useAuth();
 
     const navigate = useNavigate();
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -33,8 +36,8 @@ function Login() {
             if (response.ok) {
                 console.log('Login successful:', data);
 
-                localStorage.setItem("token", data.access_token)
-                localStorage.setItem("token-type", data.token_type)
+                const token = data.access_token;
+                setToken(token);
 
                 navigate("/tables")
             } else {

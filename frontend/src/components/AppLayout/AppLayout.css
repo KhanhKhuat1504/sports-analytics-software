@@ -5,3 +5,16 @@
   font-family: 'Segoe UI', Arial, sans-serif;
   background: #f7f9fb;
 }
+
+.sidebar-wrapper {
+  height: calc(100vh - var(--navbar-height));
+  top: var(--navbar-height);
+}
+
+.collapsed-sidebar {
+    width: var(--collapsed-sidebar-width);
+}
+
+.collapsed-outlet {
+    width: calc(100vw - var(--collapsed-sidebar-width));
+}

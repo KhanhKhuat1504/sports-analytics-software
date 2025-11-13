@@ -10,15 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@superset-ui/embedded-sdk": "^0.2.0",
     "@fortawesome/fontawesome-free": "^7.1.0",
+    "@fortawesome/fontawesome-svg-core": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/react-fontawesome": "^3.1.0",
     "@rpldy/upload-button": "^1.11.0",
     "@rpldy/uploady": "^1.11.0",
+    "@superset-ui/embedded-sdk": "^0.2.0",
     "ag-grid-community": "^34.2.0",
     "ag-grid-react": "^34.2.0",
     "bootstrap": "^5.3.8",
+    "jwt-decode": "^4.0.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.64.0",

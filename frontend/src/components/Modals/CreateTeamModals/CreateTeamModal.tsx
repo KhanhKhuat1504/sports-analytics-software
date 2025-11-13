@@ -1,43 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
 import './CreateTeamModal.css';
 
 interface CreateTeamModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onCreateTeam: (team: {
-        name: string;
-        members: string[];
-        description?: string;
-        lead?: string;
-        type?: string;
-        isPublic?: boolean;
-    }) => void;
-    teamLeads?: string[];
-    teamTypes?: string[];
+    onSuccess?: (teamData: any) => void;
+    isFirstTeam?: boolean;
 }
 
 const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
     isOpen,
     onClose,
-    onCreateTeam,
-    teamLeads = [],
-    teamTypes = [],
+    onSuccess,
+    isFirstTeam = false
 }) => {
-    const [name, setName] = React.useState('');
-    const [members, setMembers] = React.useState<string[]>([]);
-    const [memberInput, setMemberInput] = React.useState('');
-    const [description, setDescription] = React.useState('');
-    const [lead, setLead] = React.useState('');
-    const [type,setType] = React.useState('');
-    const [isPublic, setPublic] = React.useState(false);
+    const { token, refreshTeams } = useAuth();
+    const [name, setName] = useState('');
+    const [members, setMembers] = useState<string[]>([]);
+    const [memberInput, setMemberInput] = useState('');
+    const [description, setDescription] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     if (!isOpen) return null;
 
-    // change this afterwards 
-
-     const handleAddMember = () => {
-        if (memberInput.trim() && !members.includes(memberInput.trim())) {
-            setMembers([...members, memberInput.trim()]);
+    const handleAddMember = () => {
+        const trimmed = memberInput.trim();
+        if (trimmed && !members.includes(trimmed)) {
+            setMembers([...members, trimmed]);
             setMemberInput('');
         }
     };
@@ -46,138 +37,193 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
         setMembers(members.filter(m => m !== member));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!name.trim()) return;
-        onCreateTeam({
-            name: name.trim(),
-            members,
-            description: description.trim() || undefined,
-            lead: lead || undefined,
-             type: type || undefined,
-            isPublic,
-        });
-        // Reset form
-        setName('');
-        setMembers([]);
-        setDescription('');
-        setLead('');
-        setType('');
-        setIsPublic(false);
-        onClose();
+        if (!name.trim()) {
+            setError('Team name required');
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch('http://localhost:5000/api/teams/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: name.trim(),
+                    description: description.trim() || undefined,
+                    member_usernames: members.length > 0 ? members : undefined
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || 'Failed to create new team');
+            }
+
+            // Refresh list
+            await refreshTeams();
+
+            if (onSuccess) {
+                onSuccess(data);
+            }
+
+            // Reset
+            setName('');
+            setMembers([]);
+            setDescription('');
+            setMemberInput('');
+            
+            onClose();
+        } catch (err: any) {
+            setError(err.message || 'An error occurred while creating the team');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div className="create-team-overlay">
-            <div className="create-team-modal">
-                <button className="create-team-modal-close" onClick={onClose} aria-label="Close">&times;</button>
-                <h2 className="create-team-title">Create Team</h2>
+        <div className="create-team-overlay" onClick={onClose}>
+            <div className="create-team-modal" onClick={(e) => e.stopPropagation()}>
+                <button className="create-team-modal-close" onClick={onClose} aria-label="Close">
+                    &times;
+                </button>
+                
+                <h2 className="create-team-title">
+                    {isFirstTeam ? 'Create Your First Team' : 'Create New Team'}
+                </h2>
+                
+                {isFirstTeam && (
+                    <p style={{ color: '#64748b', marginBottom: '16px', fontSize: '0.95rem' }}>
+                        Let's get started by creating your first team. You can add members now or later.
+                    </p>
+                )}
+
                 <form onSubmit={handleSubmit}>
                     <input
                         type="text"
-                        placeholder="Team Name"
+                        placeholder="Team Name *"
                         value={name}
                         onChange={e => setName(e.target.value)}
                         required
+                        disabled={loading}
                     />
-                    <div>
-                        <div style={{ display: 'flex', gap: 8 }}>
-                            <input
-                                type="text"
-                                placeholder="Add member"
-                                value={memberInput}
-                                onChange={e => setMemberInput(e.target.value)}
-                            />
-                            <button
-                                type="button"
-                                className="create-team-button"
-                                 style={{ minWidth: 70 }}
-                                onClick={handleAddMember}
-                                disabled={!memberInput.trim()}
-                            >
-                                Add
-                            </button>
-                        </div>
-                        <div style={{ marginTop: 8, marginBottom: 8 }}>
-                            {members.map(member => (
-                                <span
-                                    key={member}
-                                    style={{
-                                        display: 'inline-block',
-                                        background: '#e0e7ef',
-                                        color: '#374151',
-                                        borderRadius: 12,
-                                        padding: '2px 10px',
-                                        marginRight: 6,
-                                          marginBottom: 4,
-                                        fontSize: 14,
-                                    }}
-                                >
-                                    {member}
-                                    <button
-                                        type="button"
-                                        style={{
-                                            marginLeft: 6,
-                                            background: 'none',
-                                            border: 'none',
-                                            color: '#ef4444',
-                                            cursor: 'pointer',
-                                            fontWeight: 'bold',
-                                        }}
-                                        onClick={() => handleRemoveMember(member)}
-                                        aria-label={`Remove ${member}`}
-                                    >
-                                        ×
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
-                    </div>
+
                     <textarea
                         placeholder="Description (optional)"
                         value={description}
                         onChange={e => setDescription(e.target.value)}
                         rows={3}
+                        disabled={loading}
                     />
-                    {teamLeads.length > 0 && (
-                        <select value={lead} onChange={e => setLead(e.target.value)}>
-                            <option value="">Select Team Lead (optional)</option>
-                            {teamLeads.map(l => (
-                                <option key={l} value={l}>{l}</option>
-                            ))}
-                        </select>
+
+                    <div>
+                        <label style={{ 
+                            fontSize: '0.9rem', 
+                            color: '#64748b', 
+                            marginBottom: '8px',
+                            display: 'block'
+                        }}>
+                            Add Team Members (optional)
+                        </label>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <input
+                                type="text"
+                                placeholder="Enter username"
+                                value={memberInput}
+                                onChange={e => setMemberInput(e.target.value)}
+                                onKeyPress={e => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleAddMember();
+                                    }
+                                }}
+                                disabled={loading}
+                            />
+                            <button
+                                type="button"
+                                className="create-team-button"
+                                style={{ minWidth: 70 }}
+                                onClick={handleAddMember}
+                                disabled={!memberInput.trim() || loading}
+                            >
+                                Add
+                            </button>
+                        </div>
+                        {members.length > 0 && (
+                            <div style={{ marginTop: 12, marginBottom: 8 }}>
+                                {members.map(member => (
+                                    <span
+                                        key={member}
+                                        style={{
+                                            display: 'inline-block',
+                                            background: '#e0e7ef',
+                                            color: '#374151',
+                                            borderRadius: 12,
+                                            padding: '4px 12px',
+                                            marginRight: 6,
+                                            marginBottom: 6,
+                                            fontSize: 14,
+                                        }}
+                                    >
+                                        {member}
+                                        <button
+                                            type="button"
+                                            style={{
+                                                marginLeft: 6,
+                                                background: 'none',
+                                                border: 'none',
+                                                color: '#ef4444',
+                                                cursor: 'pointer',
+                                                fontWeight: 'bold',
+                                            }}
+                                            onClick={() => handleRemoveMember(member)}
+                                            aria-label={`Remove ${member}`}
+                                            disabled={loading}
+                                        >
+                                            ×
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {error && (
+                        <div style={{
+                            background: '#fee2e2',
+                            color: '#dc2626',
+                            padding: '10px 12px',
+                            borderRadius: '6px',
+                            fontSize: '0.9rem',
+                            marginTop: '8px'
+                        }}>
+                            {error}
+                        </div>
                     )}
-                    {teamTypes.length > 0 && (
-                        <select value={type} onChange={e => setType(e.target.value)}>
-                            <option value="">Select Team Type (optional)</option>
-                            {teamTypes.map(t => (
-                                <option key={t} value={t}>{t}</option>
-                            ))}
-                        </select>
-                         )}
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                        <input
-                            type="checkbox"
-                            checked={isPublic}
-                            onChange={e => setIsPublic(e.target.checked)}
-                        />
-                        Public Team
-                    </label>
+
                     <div className="create-team-actions">
                         <button
                             type="button"
                             className="create-team-button"
                             style={{ background: "#e5e7eb", color: "#374151" }}
                             onClick={onClose}
+                            disabled={loading}
                         >
                             Cancel
-                             </button>
+                        </button>
                         <button
                             type="submit"
                             className="create-team-button"
-                            disabled={!name.trim()}
+                            disabled={!name.trim() || loading}
                         >
-                            Create
+                            {loading ? 'Creating...' : 'Create Team'}
                         </button>
                     </div>
                 </form>

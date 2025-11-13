@@ -8,6 +8,11 @@ Root User email:
 sportsanalyticscsds@gmail.com <br />
 Password: SportsAnalytics25! <br />
 
+IAM User:
+
+Ren : Username : Ren, Password: SportsAnalytics25!  
+Will : Username : Will, Password: SportsAnalytics25!
+
 
 Database Information: <br />
 Database instance identifier: sportsdatabase <br />

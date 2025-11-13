@@ -7,6 +7,8 @@ import AppLayout from "./components/AppLayout/AppLayout";
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Dashboard from "./components/Dashboard/Dashboard";
+import home from "./components/Home/Home";
+import CreateTeam from "./components/CreateTeam/CreateTeam";
 
 function App() {
     return (
@@ -28,9 +30,9 @@ function App() {
                                 path="/ai-assistant"
                                 element={<div>Test AI Assistant Route</div>}                              
                             />
-                            <Route
-                                path="/home"
-                                element={<div>Create Team</div>}                              
+                            <Route>
+                                path= "/home"
+                                element={<div>CreateTeam</div>}                          
                             />
                         </Route>
                     </Routes>

@@ -11,7 +11,8 @@ from sqlalchemy import (
     text,
 )
 from dotenv import load_dotenv
-from smolagents import tool
+from smolagents import tool as smolagent_tool
+from langchain_core.tools import tool as langchain_tool
 import os
 
 load_dotenv()
@@ -52,8 +53,8 @@ dynamic_docstring = f"""
 """
 
 _sql_engine.__doc__ = dynamic_docstring
-sql_engine = tool(_sql_engine)
-
+sa_sql_engine = smolagent_tool(_sql_engine)
+lc_sql_engine = langchain_tool(_sql_engine, description=_sql_engine.__doc__ )
 
 
 

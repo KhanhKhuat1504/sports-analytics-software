@@ -15,3 +15,7 @@ passlib[argon2]
 python-dotenv
 email-validator
 PyJWT
+langgraph
+lanchain
+langchain-openai
+langgraph-checkpoint-postgres

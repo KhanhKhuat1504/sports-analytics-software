@@ -13,7 +13,7 @@ function App() {
         <StrictMode>
             <Router>
                 <AuthProvider>
-                    {/* <NavBar /> */}
+                    {/* <NavBar/> */}
                     <Routes>
                         <Route path="/" element={<Login />} />
                         <Route path="/register" element={<Register />} />

@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 import csv, io, itertools
-
-from flask import json
+import json
 from python_ag_grid_backend.db_access.tables_operations import (
     create_table,
     insert_rows_bulk,

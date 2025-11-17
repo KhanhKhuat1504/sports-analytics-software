@@ -4,10 +4,13 @@ import Sidebar from '../Sidebar/Sidebar';
 import './AppLayout.css';
 import NavBar from '../NavBar/NavBar';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useAuth } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 function AppLayout() {
+    const { user } = useAuth();
+
     const [isCollapsed, setIsCollapsed] = useState(true);
 
     const toggleSidebar = () => {

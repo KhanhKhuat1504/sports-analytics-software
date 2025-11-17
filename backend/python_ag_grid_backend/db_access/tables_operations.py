@@ -168,3 +168,26 @@ def get_primary_key_column(table_name):
             )
             result = cur.fetchone()
             return result["attname"] if result else None
+
+def create_schema(schema_name: str):
+    """
+    Create a Postgres schema if it does not exist.
+    """
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            sql = f'CREATE SCHEMA IF NOT EXISTS "{schema_name}"'
+            cur.execute(sql)
+            conn.commit()
+    return True
+
+def delete_schema(schema_name: str, cascade: bool = False):
+    """
+    Delete schema. Be careful – CASCADE drops all tables inside.
+    """
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            sql = f'DROP SCHEMA IF EXISTS "{schema_name}" {"CASCADE" if cascade else ""}'
+            cur.execute(sql)
+            conn.commit()
+    return True
+

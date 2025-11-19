@@ -16,6 +16,6 @@ python-dotenv
 email-validator
 PyJWT
 langgraph
-lanchain
+langchain
 langchain-openai
 langgraph-checkpoint-postgres

@@ -46,6 +46,7 @@ import "./NavBar.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import sportsLogo from '../../assets/sportslogo.png';
 import { useAuth } from '../../contexts/AuthContext';
+import TeamSelector from '../Team Selector/TeamSelector';
 
 export function NavBar() {
     const { token, user, logout } = useAuth();
@@ -110,12 +111,9 @@ export function NavBar() {
                     <div className="navbar-nav d-flex align-items-center">
 
                         {token && (
-                            <button
-                                className="btn btn-success m-2"
-                                onClick={() => setShowModal(true)}
-                            >
-                                Create Team
-                            </button>
+                            <>
+                                <TeamSelector />
+                            </>
                         )}
 
                         {token ? (
@@ -140,7 +138,7 @@ export function NavBar() {
 
             {/* --------------------- CREATE TEAM MODAL --------------------- */}
             {showModal && (
-                <div className="modal show fade d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+                <div className="modal show fade d-block" tabIndex={-1} style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
                     <div className="modal-dialog">
                         <div className="modal-content">
 

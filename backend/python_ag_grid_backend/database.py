@@ -22,9 +22,11 @@ def get_connection():
     )
      
 def init_db():
-    """Initialize the users table if it does not exist."""
+    """Initialize the users, teams, and users_teams tables if they do not exist."""
     conn = get_connection()
     cur = conn.cursor()
+    
+    # Create users table
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             username TEXT PRIMARY KEY,
@@ -32,6 +34,31 @@ def init_db():
             full_name TEXT
         )
     """)
+    
+    # Create teams table
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS teams (
+            team_id UUID PRIMARY KEY,
+            team_name TEXT NOT NULL,
+            sport_type TEXT NOT NULL,
+            schema_name TEXT NOT NULL UNIQUE,
+            creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            description TEXT
+        )
+    """)
+    
+    # Create users_teams junction table
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users_teams (
+            user_id TEXT NOT NULL,
+            team_id UUID NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (user_id, team_id),
+            FOREIGN KEY (user_id) REFERENCES users(username) ON DELETE CASCADE,
+            FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE CASCADE
+        )
+    """)
+    
     conn.commit()
     cur.close()
     conn.close()

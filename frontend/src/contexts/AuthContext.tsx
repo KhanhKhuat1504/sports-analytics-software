@@ -6,12 +6,13 @@ type AuthState = {
     token: string | null;
     user?: { username: string; userId: string } | null;
     currentTeam: { id: string; name: string } | null;
-    userTeams: { id: string; name: string }[];
+    userTeams: { id: string; name: string; sport_type?: string; schema_name?: string; description?: string }[];
     setToken: (t: string | null) => void;
     setCurrentTeam: (team: { id: string; name: string } | null) => void;
-    setUserTeams: (teams: { id: string; name: string }[]) => void;
+    setUserTeams: (teams: { id: string; name: string; sport_type?: string; schema_name?: string; description?: string }[]) => void;
     logout: () => void;
     refreshTeams: () => Promise<void>;
+    switchTeam: (teamId: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -27,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return saved ? JSON.parse(saved) : null;
     });
 
-    const [userTeams, _setUserTeams] = useState<{ id: string; name: string }[]>(() => {
+    const [userTeams, _setUserTeams] = useState<{ id: string; name: string; sport_type?: string; schema_name?: string; description?: string }[]>(() => {
         const saved = localStorage.getItem("userTeams");
         return saved ? JSON.parse(saved) : [];
     });
@@ -36,6 +37,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         _setToken(t);
         if (t) {
             localStorage.setItem("token", t);
+            // Extract current_team_id from token and update currentTeam
+            try {
+                const decoded = jwtDecode<{ sub: string; current_team_id: string }>(t);
+                if (decoded.current_team_id && userTeams.length > 0) {
+                    const team = userTeams.find(t => t.id === decoded.current_team_id);
+                    if (team) {
+                        setCurrentTeam(team);
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to decode token", e);
+            }
         } else {
             localStorage.removeItem("token");
             localStorage.removeItem("currentTeam");
@@ -43,14 +56,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
-    const setUserTeams = (teams: { id: string; name: string }[]) => {
+    const setUserTeams = (teams: { id: string; name: string; sport_type?: string; schema_name?: string; description?: string }[]) => {
         _setUserTeams(teams);
         localStorage.setItem("userTeams", JSON.stringify(teams));
         
-        // If current team is not set and we have teams, set the first one as default
+        // If current team is not set and we have teams, set to the token-provided current_team_id if present,
+        // otherwise set the first team as default for the user.
         if (!currentTeam && teams.length > 0) {
-            const defaultTeam = teams[0];
-            setCurrentTeam(defaultTeam);
+            const tokenCurrentTeamId = (token ? jwtDecode<{ current_team_id?: string }>(token as string).current_team_id : null) || null;
+            let defaultTeam = teams[0];
+            if (tokenCurrentTeamId) {
+                const match = teams.find(t => t.id === tokenCurrentTeamId);
+                if (match) defaultTeam = match;
+            }
+            handleSetCurrentTeam(defaultTeam);
         }
     };
 
@@ -65,16 +84,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const logout = () => { 
         setToken(null);
-        setCurrentTeam(null);
+        handleSetCurrentTeam(null);
         _setUserTeams([]);
     }
 
     // Fetch user's teams
     const refreshTeams = async () => {
-        if (!token) return;
+        if (!token || !user?.username) return;
         
         try {
-            const response = await fetch('http://localhost:5000/api/teams/user-teams', {
+            const response = await fetch(`http://localhost:5000/api/teams/user-teams?username=${user.username}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -86,6 +105,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
         } catch (error) {
             console.error('Error fetching teams:', error);
+        }
+    };
+
+    // Switch to a different team - calls backend to get new token
+    const switchTeam = async (teamId: string) => {
+        if (!token) return;
+        
+        try {
+            const response = await fetch(`http://localhost:5000/api/teams/set-current-team/${teamId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                setToken(data.access_token); // This triggers re-renders via token change
+            } else {
+                console.error('Failed to switch team', response.status);
+            }
+        } catch (error) {
+            console.error('Error switching team:', error);
         }
     };
 
@@ -119,7 +161,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setCurrentTeam: handleSetCurrentTeam,
         setUserTeams,
         logout,
-        refreshTeams
+        refreshTeams,
+        switchTeam
     }), [token, user, currentTeam, userTeams])
 
     return (

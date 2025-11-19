@@ -3,7 +3,9 @@ from fastapi.responses import StreamingResponse
 from langchain.messages import AIMessageChunk, AIMessage, ToolMessage, ToolCallChunk, ToolCall, HumanMessage, SystemMessage
 from typing import Any, Callable, Dict, Mapping, Sequence, Optional
 from pydantic import BaseModel 
-from .login import get_current_user, UserPublic
+from .login import get_current_user, UserPublic, get_current_team_id
+from .tables import get_schema_name_for_team
+from ..db_access.tables_operations import get_all_tables_metadata
 import json
 import uuid
 
@@ -43,11 +45,30 @@ class ChatPayload(BaseModel):
 
 router = APIRouter()
 
+def build_tables_description_from_schema(schema_name: str) -> str:
+    """Build a text description of all tables in a schema for the AI assistant."""
+    tables_metadata = get_all_tables_metadata(schema_name)
+    
+    description = f"Available tables in schema '{schema_name}':\n\n"
+    for table in tables_metadata:
+        description += f"- {table['key']} ({table['columns']} columns, {table['rows']} rows)\n"
+        for col in table['columnsDef']:
+            description += f"  • {col['field']}: {col['type']}\n"
+    
+    return description
+
+async def get_schema_description(
+    team_id: str = Depends(get_current_team_id)
+):
+    schema_name = get_schema_name_for_team(team_id)
+    return build_tables_description_from_schema(schema_name)
+
 @router.post("")
 async def assistant(
-    payload: ChatPayload,
-    request: Request,
-    currentUser: UserPublic = Depends(get_current_user)
+        payload: ChatPayload,
+        request: Request,
+        currentUser: UserPublic = Depends(get_current_user),
+        tablesDescription: str = Depends(get_schema_description)
     ):
     
     app = request.app
@@ -88,7 +109,8 @@ async def assistant(
             input=input_state,
             config={"configurable": {"thread_id": thread_id}},
             # stream_mode=["updates"]
-            stream_mode=["messages"]
+            stream_mode=["messages"],
+            context={"tablesDescription": tablesDescription}
         ):
             # msg = chunk[1][0] 
             # meta_data = chunk[1][1] 

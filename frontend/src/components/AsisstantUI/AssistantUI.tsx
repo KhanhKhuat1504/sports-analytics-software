@@ -14,6 +14,15 @@ export default function Page() {
 
   const lastUserMessageIndex = useRef<number>(0);
 
+  // Recreate transport when token changes to ensure latest token is used
+  const transport = React.useMemo(
+    () => new DefaultChatTransport({
+      api: '/api/chat',
+      headers: () => ({ Authorization: `Bearer ${token}` })
+    }),
+    [token]
+  );
+
   const {
     messages,
     setMessages,
@@ -22,10 +31,7 @@ export default function Page() {
     stop,
     regenerate
   } = useChat({
-    transport: new DefaultChatTransport({
-      api: '/api/chat',
-      headers: () => ({ Authorization: `Bearer ${token}` })
-    }),
+    transport: transport,
 
     onFinish: ({ message }) => {
       setMessages(prev => {

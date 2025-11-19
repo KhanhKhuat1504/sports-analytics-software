@@ -14,6 +14,7 @@ import CreateTableButton from "../CreateTable/CreateTable";
 import CreateTableModal from "../Modals/TableOperationsModals/CreateTableModal";
 import DeleteTableModal from "../Modals/TableOperationsModals/DeleteTableModal";
 import { toColumnDefs } from "../../utilities/TableUtilities";
+import { useAuth } from '../../contexts/AuthContext';
 
 const MainContent = () => {
   const [rowData, setRowData] = useState<any[]>([]);
@@ -30,6 +31,7 @@ const MainContent = () => {
   console.log(columnDefs);
 
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   const defaultColDef = useMemo(() => ({
     sortable: true,
@@ -46,7 +48,7 @@ const MainContent = () => {
     try {
       const res = await fetch(`http://localhost:5000/api/table/${selectedTable}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ data: newRowData }),
       });
       if (!res.ok) {
@@ -69,7 +71,7 @@ const MainContent = () => {
       if (selectedTable) {
         await fetch(`http://localhost:5000/api/table/${selectedTable}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           body: JSON.stringify({
             data: updatedRowData,
             column_name: columnName,
@@ -85,6 +87,7 @@ const MainContent = () => {
     try {
       const res = await fetch(`http://localhost:5000/api/table/delete-table/${tableName}`, {
         method: "DELETE",
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       });
       if (!res.ok) {
         const errorData = await res.json();
@@ -106,7 +109,7 @@ const MainContent = () => {
   };
 
   const fetchAllTableMeta = () => {
-    fetch("http://localhost:5000/api/table/get-tables")
+    fetch("http://localhost:5000/api/table/get-tables", { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
       .then(res => res.json())
       .then(data => setTableMeta(data));
   };
@@ -117,7 +120,7 @@ const MainContent = () => {
       return;
     }
     // Fetch primary key(s) when table changes
-    fetch(`http://localhost:5000/api/table/primary-key/${selectedTable}`)
+    fetch(`http://localhost:5000/api/table/primary-key/${selectedTable}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
       .then(res => res.ok ? res.json() : Promise.reject("failed to fetch primary key"))
       .then(data => {
         const pk = data.primary_key;
@@ -133,7 +136,7 @@ const MainContent = () => {
 
   useEffect(() => {
     if (selectedTable) {
-      fetch(`http://localhost:5000/api/table/${selectedTable}`)
+      fetch(`http://localhost:5000/api/table/${selectedTable}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
         .then((res) => res.json())
         .then((data) => {
           setRowData(data.rows);
@@ -146,8 +149,11 @@ const MainContent = () => {
   }, [selectedTable, requiredColumns]);
 
   useEffect(() => {
-    fetchAllTableMeta();
-  }, []);
+    // Only fetch table metadata once a token exists (prevents unauthenticated requests)
+    if (token) {
+      fetchAllTableMeta();
+    }
+  }, [token]);
 
 
   return (
@@ -170,11 +176,11 @@ const MainContent = () => {
           )}
           <CreateTableButton onClick={() => setShowCreateTableModal(true)} />
           {showCreateTableModal && (
-            <CreateTableModal
+              <CreateTableModal
               onClose={() => setShowCreateTableModal(false)}
               onSuccess={() => {
                 // Refetch table list after creation
-                fetch("http://localhost:5000/api/table/get-tables")
+                fetch("http://localhost:5000/api/table/get-tables", { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
                   .then(res => res.json())
                   .then(data => setTableMeta(data));
               }}

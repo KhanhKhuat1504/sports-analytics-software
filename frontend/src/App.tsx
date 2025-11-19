@@ -9,6 +9,7 @@ import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Dashboard from "./components/Dashboard/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import CreateFirstTeam from "./components/CreateFirstTeam/CreateFirstTeam";
 
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/create-first-team" element={<CreateFirstTeam />} />
 
                         <Route element={<ProtectedRoute/>}>
                             <Route element={<AppLayout />}>

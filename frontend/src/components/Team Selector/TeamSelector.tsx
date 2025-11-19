@@ -1,94 +1,45 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
+import './TeamSelector.css';
 import { useAuth } from '../../contexts/AuthContext';
 import CreateTeamModal from '../Modals/CreateTeamModals/CreateTeamModal';
-import './TeamSelector.css';
 
 const TeamSelector: React.FC = () => {
-    const { currentTeam, userTeams, setCurrentTeam } = useAuth();
-    const [isOpen, setIsOpen] = useState(false);
+    const { currentTeam, userTeams, switchTeam } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Close dropdown
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const handleTeamSelect = (team: { id: string; name: string }) => {
-        setCurrentTeam(team);
-        setIsOpen(false);
-    };
-
-    const handleCreateClick = () => {
-        setIsOpen(false);
-        setShowCreateModal(true);
+    const handleSwitchTeam = async (teamId: string) => {
+        setIsLoading(true);
+        try {
+            await switchTeam(teamId);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <>
-            <div className="team-selector-wrapper" ref={dropdownRef}>
-                <button 
-                    className="team-selector-button"
-                    onClick={() => setIsOpen(!isOpen)}
-                    aria-expanded={isOpen}
-                >
-                    <span className="team-selector-label">
-                        {currentTeam ? currentTeam.name : 'Select Team'}
-                    </span>
-                    <svg 
-                        className={`team-selector-arrow ${isOpen ? 'open' : ''}`}
-                        width="12" 
-                        height="12" 
-                        viewBox="0 0 12 12"
-                        fill="currentColor"
+        <div className="team-selector-container">
+            <div className="team-tiles">
+                {userTeams && userTeams.length > 0 && userTeams.map((team) => (
+                    <button
+                        key={team.id}
+                        className={`team-tile ${currentTeam?.id === team.id ? 'active' : ''} ${isLoading ? 'disabled' : ''}`}
+                        onClick={() => handleSwitchTeam(team.id)}
+                        disabled={isLoading}
+                        title={team.name}
                     >
-                        <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="2" fill="none"/>
-                    </svg>
+                        <div className="team-tile-name">{team.name}</div>
+                        <div className="team-tile-sport">{team.sport_type}</div>
+                    </button>
+                ))}
+                <button 
+                    className="team-tile team-create-btn"
+                    onClick={() => setShowCreateModal(true)}
+                    title="Create a new team"
+                >
+                    <div className="team-tile-name">+</div>
+                    <div className="team-tile-sport">New Team</div>
                 </button>
-
-                {isOpen && (
-                    <div className="team-selector-dropdown">
-                        {userTeams.length > 0 ? (
-                            <>
-                                <div className="team-selector-section">
-                                    <div className="team-selector-section-title">Your Teams</div>
-                                    {userTeams.map(team => (
-                                        <button
-                                            key={team.id}
-                                            className={`team-selector-item ${currentTeam?.id === team.id ? 'active' : ''}`}
-                                            onClick={() => handleTeamSelect(team)}
-                                        >
-                                            <span className="team-selector-item-icon">👥</span>
-                                            {team.name}
-                                            {currentTeam?.id === team.id && (
-                                                <span className="team-selector-checkmark">✓</span>
-                                            )}
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="team-selector-divider"></div>
-                            </>
-                        ) : (
-                            <div className="team-selector-empty">
-                                <p>No teams added yet</p>
-                            </div>
-                        )}
-                        <button 
-                            className="team-selector-create-btn"
-                            onClick={handleCreateClick}
-                        >
-                            <span className="team-selector-create-icon">+</span>
-                            Create New Team
-                        </button>
-                    </div>
-                )}
             </div>
 
             {showCreateModal && (
@@ -97,7 +48,7 @@ const TeamSelector: React.FC = () => {
                     onClose={() => setShowCreateModal(false)}
                 />
             )}
-        </>
+        </div>
     );
 };
 

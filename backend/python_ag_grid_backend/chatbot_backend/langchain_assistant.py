@@ -18,8 +18,13 @@ import os
 from functools import partial
 from contextlib import asynccontextmanager
 import pprint
+from typing import TypedDict
+from langchain.agents.middleware import dynamic_prompt, ModelRequest
 
 load_dotenv()
+
+class teamContext(TypedDict):
+    tablesDescription: str
 
 model = ChatOpenAI(
     model="gpt-4o",
@@ -42,6 +47,22 @@ def pre_model_hook(state):
     return {"llm_input_messages": trimmed_messages}
 
 prompt = """You are an intelligent Sports Analytics Assistant with access to a SQL database containing basketball data. Your goal is to help analysts explore, summarize, and interpret the data through natural conversation. You can answer questions about player performance, team results, match statistics, and more. Be concise but informative in final answers"""
+
+@dynamic_prompt
+def schema_scoped_prompt(request: ModelRequest) -> str:
+    """Generate system prompt based on the team that is being selected, indicated by NavBar"""
+    
+    base_prompt = """You are an intelligent Sports Analytics Assistant with access to a SQL database containing basketball data. Your goal is to help analysts explore, summarize, and interpret the data through natural conversation. You can answer questions about player performance, team results, match statistics, and more. Be concise but informative in final answers"""
+    
+    tables_description = request.runtime.context.get("tablesDescription")
+    
+    schema_aware_prompt = f"""
+        You are querying from this schema.  
+        {tables_description}
+        Always use fully qualified table names: schema_name.table_name
+    """
+    
+    return base_prompt + schema_aware_prompt
 
 # Create a simple ReAct Agent. The agent alternates between `agent` and `tool` node. The execution flow simply stops when the LLM output doesn't include a `tool_calls` attribute, meaning it decides no other tool needs to / has to be called. 
 
@@ -86,8 +107,9 @@ async def init_agent():
                     # keep=("messages", 20),
                     # trim_token_to_summarize=1500,
                     # summary_prompts=SUMMARY_GUIDE_PROMPT,
-                ),
+                ), schema_scoped_prompt
             ],
+            context_schema=teamContext,
             checkpointer=memory
         )
         yield agent, memory

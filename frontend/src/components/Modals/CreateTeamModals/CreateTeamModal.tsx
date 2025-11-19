@@ -15,32 +15,24 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
     onSuccess,
     isFirstTeam = false
 }) => {
-    const { token, refreshTeams } = useAuth();
-    const [name, setName] = useState('');
-    const [members, setMembers] = useState<string[]>([]);
-    const [memberInput, setMemberInput] = useState('');
+    const { token, setToken } = useAuth();
+    const [teamName, setTeamName] = useState('');
+    const [sportType, setSportType] = useState('');
     const [description, setDescription] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     if (!isOpen) return null;
 
-    const handleAddMember = () => {
-        const trimmed = memberInput.trim();
-        if (trimmed && !members.includes(trimmed)) {
-            setMembers([...members, trimmed]);
-            setMemberInput('');
-        }
-    };
-
-    const handleRemoveMember = (member: string) => {
-        setMembers(members.filter(m => m !== member));
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!name.trim()) {
-            setError('Team name required');
+        
+        if (!teamName.trim()) {
+            setError('Team name is required');
+            return;
+        }
+        if (!sportType.trim()) {
+            setError('Sport type is required');
             return;
         }
 
@@ -48,37 +40,36 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
         setError(null);
 
         try {
-            const response = await fetch('http://localhost:5000/api/teams/create', {
+            const response = await fetch('http://localhost:5000/api/teams/create-team', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    name: name.trim(),
-                    description: description.trim() || undefined,
-                    member_usernames: members.length > 0 ? members : undefined
+                    team_name: teamName.trim(),
+                    sport_type: sportType.trim(),
+                    description: description.trim() || null
                 })
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.detail || 'Failed to create new team');
+                throw new Error(data.detail || 'Failed to create team');
             }
 
-            // Refresh list
-            await refreshTeams();
+            // Update token with new team
+            setToken(data.access_token);
 
             if (onSuccess) {
                 onSuccess(data);
             }
 
             // Reset
-            setName('');
-            setMembers([]);
+            setTeamName('');
+            setSportType('');
             setDescription('');
-            setMemberInput('');
             
             onClose();
         } catch (err: any) {
@@ -87,6 +78,18 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
             setLoading(false);
         }
     };
+
+    const sportOptions = [
+        'Basketball',
+        'Football',
+        'Baseball',
+        'Soccer',
+        'Hockey',
+        'Volleyball',
+        'Tennis',
+        'Golf',
+        'Other'
+    ];
 
     return (
         <div className="create-team-overlay" onClick={onClose}>
@@ -101,7 +104,7 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
                 
                 {isFirstTeam && (
                     <p style={{ color: '#64748b', marginBottom: '16px', fontSize: '0.95rem' }}>
-                        Let's get started by creating your first team. You can add members now or later.
+                        Let's get started by creating your first team.
                     </p>
                 )}
 
@@ -109,11 +112,33 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
                     <input
                         type="text"
                         placeholder="Team Name *"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
+                        value={teamName}
+                        onChange={e => setTeamName(e.target.value)}
                         required
                         disabled={loading}
                     />
+
+                    <select
+                        value={sportType}
+                        onChange={e => setSportType(e.target.value)}
+                        required
+                        disabled={loading}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            marginBottom: '12px',
+                            borderRadius: '6px',
+                            border: '1px solid #d1d5db',
+                            fontSize: '14px'
+                        }}
+                    >
+                        <option value="">Select Sport Type *</option>
+                        {sportOptions.map(sport => (
+                            <option key={sport} value={sport}>
+                                {sport}
+                            </option>
+                        ))}
+                    </select>
 
                     <textarea
                         placeholder="Description (optional)"
@@ -122,78 +147,6 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
                         rows={3}
                         disabled={loading}
                     />
-
-                    <div>
-                        <label style={{ 
-                            fontSize: '0.9rem', 
-                            color: '#64748b', 
-                            marginBottom: '8px',
-                            display: 'block'
-                        }}>
-                            Add Team Members (optional)
-                        </label>
-                        <div style={{ display: 'flex', gap: 8 }}>
-                            <input
-                                type="text"
-                                placeholder="Enter username"
-                                value={memberInput}
-                                onChange={e => setMemberInput(e.target.value)}
-                                onKeyPress={e => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        handleAddMember();
-                                    }
-                                }}
-                                disabled={loading}
-                            />
-                            <button
-                                type="button"
-                                className="create-team-button"
-                                style={{ minWidth: 70 }}
-                                onClick={handleAddMember}
-                                disabled={!memberInput.trim() || loading}
-                            >
-                                Add
-                            </button>
-                        </div>
-                        {members.length > 0 && (
-                            <div style={{ marginTop: 12, marginBottom: 8 }}>
-                                {members.map(member => (
-                                    <span
-                                        key={member}
-                                        style={{
-                                            display: 'inline-block',
-                                            background: '#e0e7ef',
-                                            color: '#374151',
-                                            borderRadius: 12,
-                                            padding: '4px 12px',
-                                            marginRight: 6,
-                                            marginBottom: 6,
-                                            fontSize: 14,
-                                        }}
-                                    >
-                                        {member}
-                                        <button
-                                            type="button"
-                                            style={{
-                                                marginLeft: 6,
-                                                background: 'none',
-                                                border: 'none',
-                                                color: '#ef4444',
-                                                cursor: 'pointer',
-                                                fontWeight: 'bold',
-                                            }}
-                                            onClick={() => handleRemoveMember(member)}
-                                            aria-label={`Remove ${member}`}
-                                            disabled={loading}
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-                    </div>
 
                     {error && (
                         <div style={{
@@ -221,7 +174,7 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
                         <button
                             type="submit"
                             className="create-team-button"
-                            disabled={!name.trim() || loading}
+                            disabled={!teamName.trim() || !sportType.trim() || loading}
                         >
                             {loading ? 'Creating...' : 'Create Team'}
                         </button>

@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from python_ag_grid_backend.models.models import (
     TableRowUpdateRequest,
     TableRowAddRequest,
+    TableRowDeleteRequest,
     CreateTableRequest,
 )
 from python_ag_grid_backend.db_access.tables_operations import (
@@ -9,6 +10,7 @@ from python_ag_grid_backend.db_access.tables_operations import (
     get_all_tables_metadata,
     add_table_row,
     update_table_row,
+    delete_table_row,
     create_table,
     delete_table,
     get_primary_key_column,
@@ -146,5 +148,14 @@ def update_table_row_endpoint(table_name: str, req: TableRowUpdateRequest, team_
         schema_name = get_schema_name_for_team(team_id)
         updated_row = update_table_row(table_name, req.data, schema_name)
         return {"success": True, "row": updated_row}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+
+@router.delete("/{table_name}")
+def delete_table_row_endpoint(table_name: str, req: TableRowDeleteRequest):
+    try:
+        delete_table_row(table_name, req.data)
+        return {"success": True, "message": f"Row with primary key '{req.data}' deleted from table '{table_name}'."}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

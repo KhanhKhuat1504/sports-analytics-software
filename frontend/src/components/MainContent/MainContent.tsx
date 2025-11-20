@@ -16,6 +16,8 @@ import DeleteTableModal from "../Modals/TableOperationsModals/DeleteTableModal";
 import { toColumnDefs } from "../../utilities/TableUtilities";
 import { useAuth } from '../../contexts/AuthContext';
 
+//TODO: When user import a table that already exists, ask them if they want to overwrite the existing table or add the rows that don't already exist.
+
 const MainContent = () => {
   const [rowData, setRowData] = useState<any[]>([]);
   const [columnDefs, setColumnDefs] = useState<any[]>([]);
@@ -40,6 +42,23 @@ const MainContent = () => {
     floatingFilter: true,
     resizable: true,
   }), []);
+
+  const actionsColDef = {
+    headerName: "Actions",
+    field: "actions",
+    cellRenderer: (params: any) => (
+      <div style={{ display: "flex", gap: 8 }}>
+        <span
+          style={{ color: "#ef4444", cursor: "pointer" }}
+          title="Delete"
+          onClick={() => handleDeleteRow(params.data)}
+        >
+          🗑️
+        </span>
+      </div>
+    ),
+    editable: false,
+  };
 
   const handleAddRow = async () => {
     if (!selectedTable) {
@@ -80,6 +99,40 @@ const MainContent = () => {
       }
     } catch (error) {
       console.error("Error updating row:", error);
+    }
+  };
+
+  const handleDeleteRow = async (rowDataToDelete: any) => {
+    console.log("Deleting row:", rowDataToDelete);
+    console.log("Required columns for PK:", requiredColumns);
+    console.log(selectedTable);
+    if (!selectedTable || requiredColumns.length === 0) return;
+    // Build PK object for all PK columns
+    const pkObj = Object.fromEntries(
+      requiredColumns.map(k => [k, rowDataToDelete[k]])
+    );
+    console.log("Primary key object for deletion:", pkObj);
+    if (Object.values(pkObj).some(v => v === undefined)) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/table/${selectedTable}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: pkObj }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        alert(errorData.detail || "Failed to delete row");
+        return;
+      }
+      // Remove the row from state
+      setRowData(prev =>
+        prev.filter(row =>
+          !requiredColumns.every(k => row[k] === rowDataToDelete[k])
+        )
+      );
+    } catch (err) {
+      alert("Network error");
     }
   };
 
@@ -233,7 +286,7 @@ const MainContent = () => {
           )}
           <AgGridReact
             rowData={rowData}
-            columnDefs={columnDefs}
+            columnDefs={[...columnDefs, actionsColDef]}
             defaultColDef={defaultColDef}
             singleClickEdit={true}
             onCellValueChanged={(params) => handleUpdateRow(params.data, params.colDef.field ?? "")}
@@ -247,12 +300,10 @@ const MainContent = () => {
               setNewRowData={setNewRowData}
               onAdd={async () => {
                 await handleAddRow();
-                setRequiredColumns([]);
               }}
               onCancel={() => {
                 setShowAddModal(false);
                 setNewRowData({});
-                setRequiredColumns([]);
               }}
               addError={addError}
             />

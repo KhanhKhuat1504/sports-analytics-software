@@ -10,6 +10,7 @@ Password: SportsAnalytics25! <br />
 
 IAM User:
 
+alias number: 205991466141
 Ren : Username : Ren, Password: SportsAnalytics25!  
 Will : Username : Will, Password: SportsAnalytics25!
 

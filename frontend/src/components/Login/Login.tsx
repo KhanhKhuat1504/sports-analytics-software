@@ -88,7 +88,7 @@ function Login() {
                     </form>
                     <hr className="my-3" />
                     <p className="text-center mb-0">
-                        Don't have an account? <Link to="/register">Login here</Link>
+                        Don't have an account? <Link to="/register">Register here</Link>
                     </p>
                 </div>
             </div>

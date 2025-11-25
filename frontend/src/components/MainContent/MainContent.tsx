@@ -30,7 +30,6 @@ const MainContent = () => {
   const [addError, setAddError] = useState<string | null>(null);
   const [tableMeta, setTableMeta] = useState<any[]>([]);
   const { selectedTable } = useParams();
-  console.log(columnDefs);
 
   const navigate = useNavigate();
   const { token } = useAuth();
@@ -65,7 +64,7 @@ const MainContent = () => {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:5000/api/table/${selectedTable}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ data: newRowData }),
@@ -88,7 +87,7 @@ const MainContent = () => {
   const handleUpdateRow = async (updatedRowData: any, columnName: string) => {
     try {
       if (selectedTable) {
-        await fetch(`http://localhost:5000/api/table/${selectedTable}`, {
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           body: JSON.stringify({
@@ -103,19 +102,15 @@ const MainContent = () => {
   };
 
   const handleDeleteRow = async (rowDataToDelete: any) => {
-    console.log("Deleting row:", rowDataToDelete);
-    console.log("Required columns for PK:", requiredColumns);
-    console.log(selectedTable);
     if (!selectedTable || requiredColumns.length === 0) return;
     // Build PK object for all PK columns
     const pkObj = Object.fromEntries(
       requiredColumns.map(k => [k, rowDataToDelete[k]])
     );
-    console.log("Primary key object for deletion:", pkObj);
     if (Object.values(pkObj).some(v => v === undefined)) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/table/${selectedTable}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: pkObj }),
@@ -138,7 +133,7 @@ const MainContent = () => {
 
   const handleDeleteTable = async (tableName: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/table/delete-table/${tableName}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/delete-table/${tableName}`, {
         method: "DELETE",
         headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       });
@@ -162,7 +157,7 @@ const MainContent = () => {
   };
 
   const fetchAllTableMeta = () => {
-    fetch("http://localhost:5000/api/table/get-tables", { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/get-tables`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
       .then(res => res.json())
       .then(data => setTableMeta(data));
   };
@@ -173,7 +168,7 @@ const MainContent = () => {
       return;
     }
     // Fetch primary key(s) when table changes
-    fetch(`http://localhost:5000/api/table/primary-key/${selectedTable}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/primary-key/${selectedTable}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
       .then(res => res.ok ? res.json() : Promise.reject("failed to fetch primary key"))
       .then(data => {
         const pk = data.primary_key;
@@ -189,7 +184,7 @@ const MainContent = () => {
 
   useEffect(() => {
     if (selectedTable) {
-      fetch(`http://localhost:5000/api/table/${selectedTable}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
+      fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
         .then((res) => res.json())
         .then((data) => {
           setRowData(data.rows);
@@ -233,7 +228,7 @@ const MainContent = () => {
               onClose={() => setShowCreateTableModal(false)}
               onSuccess={() => {
                 // Refetch table list after creation
-                fetch("http://localhost:5000/api/table/get-tables", { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/get-tables`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
                   .then(res => res.json())
                   .then(data => setTableMeta(data));
               }}

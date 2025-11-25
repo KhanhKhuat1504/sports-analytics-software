@@ -1,6 +1,6 @@
 const AssistantFrame = () => (
     <iframe 
-        src="http://localhost:5000/ai-assistant"
+        src={`${import.meta.env.VITE_API_BASE_URL}/ai-assistant`}
         title="AI Assistant"
         style={{ width: "100%", height: "90vh", border: "none"}}
     />

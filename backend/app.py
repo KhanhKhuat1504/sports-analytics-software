@@ -1,4 +1,5 @@
 # backend/app.py
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -53,7 +54,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=os.getenv("APP_URL").strip("[]").replace('"', '').split(", "),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

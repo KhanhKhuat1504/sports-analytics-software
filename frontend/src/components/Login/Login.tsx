@@ -23,7 +23,7 @@ function Login() {
             const formData = new URLSearchParams();
             formData.append("username", username);
             formData.append("password", password);
-            const response = await fetch('http://localhost:5000/api/login/login', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/login/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

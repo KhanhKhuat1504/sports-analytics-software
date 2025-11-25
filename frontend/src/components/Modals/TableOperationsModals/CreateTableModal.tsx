@@ -57,7 +57,7 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({ onClose, onSuccess 
         ? { ...col, type: col.type + " PRIMARY KEY" }
         : col
     );
-    const res = await fetch("http://localhost:5000/api/table/create-table", {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/create-table`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify({ table_name: tableName, columns: columnsWithPK }),

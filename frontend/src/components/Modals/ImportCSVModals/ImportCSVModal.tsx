@@ -7,7 +7,7 @@ interface ImportCSVModalProps {
   uploadUrl?: string;
 }
 
-export default function ImportCSVModal({ onClose, onSuccess, uploadUrl = "http://localhost:5000/api/upload/import-csv" }: ImportCSVModalProps) {
+export default function ImportCSVModal({ onClose, onSuccess, uploadUrl = `${import.meta.env.VITE_API_BASE_URL}/api/upload/import-csv` }: ImportCSVModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [tableName, setTableName] = useState("");
   const [loading, setLoading] = useState(false);

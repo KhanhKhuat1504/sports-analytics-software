@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!token || !user?.username) return;
         
         try {
-            const response = await fetch(`http://localhost:5000/api/teams/user-teams?username=${user.username}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teams/user-teams?username=${user.username}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!token) return;
         
         try {
-            const response = await fetch(`http://localhost:5000/api/teams/set-current-team/${teamId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teams/set-current-team/${teamId}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`

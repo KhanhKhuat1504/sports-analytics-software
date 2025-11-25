@@ -1,6 +1,7 @@
 # Python virtual environment
 __pycache__/
 venv/
+newVenv/
 
 # Node.js dependencies
 node_modules/

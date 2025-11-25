@@ -11,8 +11,10 @@ Password: SportsAnalytics25! <br />
 IAM User:
 
 Ren : Username : Ren, Password: SportsAnalytics25!  
-Will : Username : Will, Password: SportsAnalytics25!
-
+Will : Username : Will, Password: SportsAnalytics25!  
+Long: Username: Long, Password: SportsAnalytics25!  
+Quan: Username: Quan, Password: SportsAnalytics25!  
+Jessie: Username: Jessie, Password: SportsAnalytics25!  
 
 Database Information: <br />
 Database instance identifier: sportsdatabase <br />

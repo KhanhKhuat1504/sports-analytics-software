@@ -1,62 +1,69 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faLightbulb, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './Sidebar.css';
 
-function Sidebar({ onToggle }) {
+function Sidebar({ onToggle, collapsed = false }) {
+    const location = useLocation();
+    
+    const isActive = (path: string) => location.pathname.includes(path);
+
     return(
-        <div className="d-flex flex-column h-100 pt-3" style={{width: '100%'}}>
-              <div className="p-3">
-                <div className="h4 mb-1">
-                    SportsAnalytics <span className="text-primary">AI</span>
-                    <button onClick={onToggle} className="h5 text-dark bg-transparent border-0 ml-2">
+        <div className={`app-sidebar d-flex flex-column h-100 ${collapsed ? 'collapsed' : ''}`}>
+            <div className="sidebar-header">
+                <div className="sidebar-brand">
+                    <span className="brand-text">SportsAnalytics</span>
+                    <span className="brand-ai">AI</span>
+                    <button onClick={onToggle} className="sidebar-toggle" title="Collapse sidebar">
                         <FontAwesomeIcon icon={faChevronLeft} />
                     </button>
                 </div>
-                <p className="text-muted small mb-0">Powered by conversational <br/> analytics</p>
-              </div>
+                <p className="sidebar-subtitle">Powered by conversational analytics</p>
+            </div>
 
-              <div className="flex-grow-1 p-3">
-                <div className="d-flex align-items-center gap-3 p-3 border-top border-bottom bg-opacity-25 mb-3">
-                  <FontAwesomeIcon icon={faMagnifyingGlass} className="fs-5" />
-                  <div>
-                    <div className="fw-semibold">All Teams View</div>
-                    <div className="text-muted small">Complete NBA overview</div>
-                  </div>
+            <div className="sidebar-content flex-grow-1">
+                <div className="sidebar-section-highlight">
+                    <FontAwesomeIcon icon={faMagnifyingGlass} className="section-icon" />
+                    <div className="section-text">
+                        <div className="section-title">Main Menu</div>
+                        <div className="section-desc">Complete analytics workflow</div>
+                    </div>
                 </div>
 
-                <ul className="list-unstyled">
-                  <li className="mb-2">
-                    <Link to="/ai-assistant" className="text-decoration-none d-block p-2">
-                      AI Assistant
+                <nav className="sidebar-nav">
+                    <Link 
+                        to="/ai-assistant" 
+                        className={`nav-item ${isActive('ai-assistant') ? 'active' : ''}`}
+                    >
+                        AI Assistant
                     </Link>
-                  </li>
-                  <li className="mb-2">
-                    <Link to="/tables" className="text-decoration-none d-block p-2 ">
-                      Tables
+                    <Link 
+                        to="/tables" 
+                        className={`nav-item ${isActive('tables') ? 'active' : ''}`}
+                    >
+                        Tables
                     </Link>
-                  </li>
-                  <li className="mb-2">
-                    <Link to="/dashboard" className="text-decoration-none d-block p-2">
-                      Analytics Dashboard
+                    <Link 
+                        to="/dashboard" 
+                        className={`nav-item ${isActive('dashboard') ? 'active' : ''}`}
+                    >
+                        Analytics Dashboard
                     </Link>
-                  </li>
-                </ul>
-              </div>
+                </nav>
+            </div>
 
-              <div className="p-3 border-top border-secondary">
-                <div className="small">
-                  <div className="fw-bold mb-2">
+            <div className="sidebar-footer">
+                <div className="footer-label">
                     <FontAwesomeIcon icon={faLightbulb} /> Try asking:
-                  </div>
-                  <ul className="list-unstyled ps-3 text-muted">
-                    <li className="mb-1">"Show All Teams View top scorers"</li>
-                    <li className="mb-1">"What's our win rate at home?"</li>
-                    <li className="mb-1">"Compare player performance"</li>
-                  </ul>
                 </div>
-              </div>
+                <ul className="footer-tips">
+                    <li>"Show All Teams View top scorers"</li>
+                    <li>"What's our win rate at home?"</li>
+                    <li>"Compare player performance"</li>
+                </ul>
+            </div>
         </div>
     );
 }

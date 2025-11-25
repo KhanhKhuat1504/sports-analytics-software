@@ -237,8 +237,6 @@ const MainContent = () => {
         </div>
       </header>
       <div className="search-bar">
-        <input type="text" placeholder="Search tables..." />
-        <span className="tables-used">3/20 Tables Used</span>
       </div>
       {!selectedTable ? (
         <div className="table-cards">

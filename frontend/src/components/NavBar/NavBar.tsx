@@ -1,56 +1,14 @@
-// import React, { useState, useEffect } from "react";
-// import { Link } from 'react-router-dom';
-// import "./NavBar.css";
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import sportsLogo from '../../assets/sportslogo.png';
-// import { useAuth } from '../../contexts/AuthContext';
-
-// export function NavBar(){
-//     const { token, user, logout } = useAuth();
-
-//     return(
-//         <nav className="navbar navbar-expand-lg navbar-light bg-light ms-auto">
-//             <div className="container-fluid">
-//                 <Link className="navbar-brand" to="/">
-//                     <img src={sportsLogo} alt="Logo" className="img-fluid" style={{ maxHeight: '40px' }} />
-//                     Sports Analytics Software
-//                 </Link>
-//                 <div className="navbar-nav">
-//                     {token ? (
-//                         <>
-//                             <button onClick={logout} className="btn btn-primary m-2">
-//                                 Logout
-//                             </button>
-//                         </>
-//                     ) : (
-//                         <>
-//                             <Link to="/">
-//                                 <button className="btn btn-primary m-2">Login</button>
-//                             </Link>
-//                             <Link to="/register">
-//                                 <button className="btn btn-secondary m-2">Register</button>
-//                             </Link>
-//                         </>
-//                     )}
-//                 </div>
-//             </div>
-//         </nav>
-//     );
-// };
-
-// export default NavBar;
-
 import React, { useState } from "react";
 import { Link } from 'react-router-dom';
 import "./NavBar.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import sportsLogo from '../../assets/sportslogo.png';
 import { useAuth } from '../../contexts/AuthContext';
 import TeamSelector from '../Team Selector/TeamSelector';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 export function NavBar() {
     const { token, user, logout } = useAuth();
-
     const [showModal, setShowModal] = useState(false);
     const [teamName, setTeamName] = useState("");
     const [teamDesc, setTeamDesc] = useState("");
@@ -61,25 +19,17 @@ export function NavBar() {
             alert("Team name is required.");
             return;
         }
-
         setLoading(true);
 
-        let username = "";
-        if (user) {
-            username = user.username
-        }
-
-        console.log(username)
+        let username = user?.username || "";
         const payload = {
-                    username,
-                    teamName,
-                    teamDesc,
-                }
-        console.log(payload)
+            username,
+            teamName,
+            teamDesc,
+        };
 
         try {
-            // You will implement this backend later
-            const res = await fetch("/api/teams/create-team", {
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/teams/create-team`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -101,15 +51,13 @@ export function NavBar() {
 
     return (
         <>
-            <nav className="navbar navbar-expand-lg navbar-light bg-light ms-auto">
-                <div className="container-fluid">
-                    <Link className="navbar-brand" to="/">
-                        <img src={sportsLogo} alt="Logo" className="img-fluid" style={{ maxHeight: '40px' }} />
-                        Sports Analytics Software
+            <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+                <div className="container-fluid px-4">
+                    <Link className="navbar-brand fw-bold" to="/">
+                        <span className="brand-name">Sports Analytics Software</span>
                     </Link>
 
-                    <div className="navbar-nav d-flex align-items-center">
-
+                    <div className="navbar-nav ms-auto d-flex align-items-center gap-3">
                         {token && (
                             <>
                                 <TeamSelector />
@@ -117,18 +65,21 @@ export function NavBar() {
                         )}
 
                         {token ? (
-                            <>
-                                <button onClick={logout} className="btn btn-primary m-2">
-                                    Logout
-                                </button>
-                            </>
+                            <button 
+                                onClick={logout} 
+                                className="btn btn-primary btn-sm"
+                                title="Logout"
+                            >
+                                <FontAwesomeIcon icon={faSignOutAlt} className="me-1" />
+                                Logout
+                            </button>
                         ) : (
                             <>
                                 <Link to="/">
-                                    <button className="btn btn-primary m-2">Login</button>
+                                    <button className="btn btn-primary btn-sm">Login</button>
                                 </Link>
                                 <Link to="/register">
-                                    <button className="btn btn-secondary m-2">Register</button>
+                                    <button className="btn btn-outline-primary btn-sm">Register</button>
                                 </Link>
                             </>
                         )}
@@ -136,23 +87,18 @@ export function NavBar() {
                 </div>
             </nav>
 
-            {/* --------------------- CREATE TEAM MODAL --------------------- */}
+            {/* CREATE TEAM MODAL */}
             {showModal && (
-                <div className="modal show fade d-block" tabIndex={-1} style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+                <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
                     <div className="modal-dialog">
                         <div className="modal-content">
-
                             <div className="modal-header">
                                 <h5 className="modal-title">Create a New Team</h5>
-                                <button
-                                    className="btn-close"
-                                    onClick={() => setShowModal(false)}
-                                ></button>
+                                <button className="btn-close" onClick={() => setShowModal(false)}></button>
                             </div>
-
                             <div className="modal-body">
                                 <div className="mb-3">
-                                    <label className="form-label">Team Name</label>
+                                    <label className="form-label fw-500">Team Name</label>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -161,9 +107,8 @@ export function NavBar() {
                                         placeholder="e.g., Lakers, Warriors"
                                     />
                                 </div>
-
                                 <div className="mb-3">
-                                    <label className="form-label">Description (optional)</label>
+                                    <label className="form-label fw-500">Description (optional)</label>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -173,7 +118,6 @@ export function NavBar() {
                                     />
                                 </div>
                             </div>
-
                             <div className="modal-footer">
                                 <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
                                     Cancel
@@ -186,7 +130,6 @@ export function NavBar() {
                                     {loading ? "Creating..." : "Create Team"}
                                 </button>
                             </div>
-
                         </div>
                     </div>
                 </div>

@@ -1,3 +1,9 @@
+:root {
+  --navbar-height: 98px;
+  --sidebar-width: 260px;
+  --collapsed-sidebar-width: 70px;
+}
+
 .app-layout {
   display: flex;
   min-height: 100vh;

@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 function AppLayout() {
-    const { user } = useAuth();
 
     const [isCollapsed, setIsCollapsed] = useState(true);
 

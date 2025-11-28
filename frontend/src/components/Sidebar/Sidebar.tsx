@@ -1,11 +1,10 @@
-import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faLightbulb, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Sidebar.css';
 
-function Sidebar({ onToggle, collapsed = false }) {
+function Sidebar({ onToggle, collapsed = false } : { onToggle: () => void; collapsed?: boolean }) {
     const location = useLocation();
     
     const isActive = (path: string) => location.pathname.includes(path);

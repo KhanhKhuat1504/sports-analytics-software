@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from 'react-router-dom';
 import "./NavBar.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../../contexts/AuthContext';
 import TeamSelector from '../Team Selector/TeamSelector';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 export function NavBar() {
     const { token, user, logout } = useAuth();

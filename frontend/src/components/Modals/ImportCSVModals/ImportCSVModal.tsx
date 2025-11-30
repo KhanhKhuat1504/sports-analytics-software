@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAuth } from '../../contexts/AuthContext';
 import "./ImportCSVModal.css";
 
 interface ImportCSVModalProps {
@@ -14,6 +15,8 @@ export default function ImportCSVModal({ onClose, onSuccess, uploadUrl = `${impo
   const [error, setError] = useState<string | null>(null);
   const [headers, setHeaders] = useState<string[]>([]);
   const [primaryKeys, setPrimaryKeys] = useState<string[]>([]);
+
+  const { token } = useAuth();
 
   // Parse headers when file is selected
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +58,8 @@ export default function ImportCSVModal({ onClose, onSuccess, uploadUrl = `${impo
     if (tableName.trim()) fd.append("table_name", tableName.trim());
     if (primaryKeys.length) fd.append("primary_keys", JSON.stringify(primaryKeys));
     try {
-      const res = await fetch(uploadUrl, { method: "POST", body: fd });
+      const res = await fetch(uploadUrl, 
+        { method: "POST", headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: fd });
       const data = await res.json();
       if (!res.ok) {
         setError(data.detail || "Failed to import CSV");

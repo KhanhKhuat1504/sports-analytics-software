@@ -115,38 +115,44 @@ def get_current_team_id(token: str = Depends(oauth2_scheme)) -> str:
 def register_user(body: UserCreate):
     hashed = hash_password(body.password)
     create_user(body.username, hashed, body.full_name or "")
+    
+    # DISABLED: Admin account creation flow - security vulnerability fix
     # If this registration requests admin mapping, link (or create) a team mapped to the 'public' schema
-    if body.is_admin:
-        conn = get_connection()
-        cur = conn.cursor()
-        try:
-            # Try to find an existing team mapped to 'public'
-            cur.execute("SELECT team_id FROM teams WHERE schema_name = %s LIMIT 1", ("public",))
-            row = cur.fetchone()
-            if row:
-                team_id = row["team_id"]
-            else:
-                team_id = str(uuid.uuid4())
-                # create a simple admin team that points to the public schema
-                cur.execute(
-                    "INSERT INTO teams (team_id, team_name, sport_type, schema_name, description) VALUES (%s, %s, %s, %s, %s)",
-                    (team_id, f"{body.username}_admin", "admin", "public", "Admin mapping to public schema")
-                )
-                conn.commit()
-
-            # Ensure user -> team mapping exists
-            cur.execute(
-                "INSERT INTO users_teams (user_id, team_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
-                (body.username, str(team_id))
-            )
-            conn.commit()
-        finally:
-            cur.close()
-            conn.close()
-
-        # Return token with current_team_id set to the public-mapped team so the UI will show public tables
-        access_token = create_access_token({"sub": body.username, "current_team_id": str(team_id)})
-        return {"access_token": access_token, "token_type": "bearer"}
+    # if body.is_admin:
+    #     conn = get_connection()
+    #     cur = conn.cursor()
+    #     try:
+    #         # Try to find an existing team mapped to 'public'
+    #         cur.execute("SELECT team_id FROM teams WHERE schema_name = %s LIMIT 1", ("public",))
+    #         row = cur.fetchone()
+    #         if row:
+    #             team_id = row["team_id"]
+    #         else:
+    #             team_id = str(uuid.uuid4())
+    #             # create a simple admin team that points to the public schema
+    #             cur.execute(
+    #                 "INSERT INTO teams (team_id, team_name, sport_type, schema_name, description) VALUES (%s, %s, %s, %s, %s)",
+    #                 (team_id, f"{body.username}_admin", "admin", "public", "Admin mapping to public schema")
+    #             )
+    #             conn.commit()
+    #
+    #         # Ensure user -> team mapping exists
+    #         cur.execute(
+    #             "INSERT INTO users_teams (user_id, team_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
+    #             (body.username, str(team_id))
+    #         )
+    #         conn.commit()
+    #     finally:
+    #         cur.close()
+    #         conn.close()
+    #
+    #         # Return token with current_team_id set to the public-mapped team so the UI will show public tables
+    #         access_token = create_access_token({"sub": body.username, "current_team_id": str(team_id)})
+    #         return {"access_token": access_token, "token_type": "bearer"}
+    
+    # All users now follow normal registration flow
+    access_token = create_access_token({"sub": body.username})
+    return {"access_token": access_token, "token_type": "bearer"}
 
     # Default: return temporary JWT without team_id (for team creation flow)
     access_token = create_access_token({"sub": body.username})

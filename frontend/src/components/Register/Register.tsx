@@ -43,13 +43,14 @@ function Register() {
                 throw new Error(data.message || 'Registration failed');
             }
 
+            // DISABLED: Admin account creation flow - security vulnerability fix
             // If registering as admin, set token and go straight to tables (admin mapped to public schema)
-            if (formData.is_admin) {
-                if (setToken) setToken(data.access_token);
-                else localStorage.setItem('token', data.access_token);
-                navigate('/tables');
-                return;
-            }
+            // if (formData.is_admin) {
+            //     if (setToken) setToken(data.access_token);
+            //     else localStorage.setItem('token', data.access_token);
+            //     navigate('/tables');
+            //     return;
+            // }
 
             // Store temporary token for team creation flow
             localStorage.setItem('registrationToken', data.access_token);
@@ -132,7 +133,8 @@ function Register() {
                             />
                         </div>
 
-                        <div className="mb-3 form-check">
+                        {/* DISABLED: Admin account creation - security vulnerability fix */}
+                        {/* <div className="mb-3 form-check">
                             <input
                                 type="checkbox"
                                 className="form-check-input"
@@ -140,7 +142,7 @@ function Register() {
                                 {...register("is_admin")}
                             />
                             <label className="form-check-label" htmlFor="is_admin">Register as admin (map to public schema)</label>
-                        </div>
+                        </div> */}
 
                         <button
                             type="submit"

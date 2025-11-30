@@ -2,7 +2,6 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZIPMiddleware
 from dotenv import load_dotenv
 from python_ag_grid_backend.routers import tables, upload, login, assistant, teams
 # import gradio as gr
@@ -60,7 +59,7 @@ async def lifespan(app: FastAPI):
         raise
     
 
-app = FastAPI(lifespan=lifespan, max_size=)
+app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("APP_URL").strip("[]").replace('"', '').split(", "),

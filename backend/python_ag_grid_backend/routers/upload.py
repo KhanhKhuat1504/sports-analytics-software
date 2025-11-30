@@ -1,13 +1,35 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 import csv, io, itertools
 import json
 from python_ag_grid_backend.db_access.tables_operations import (
     create_table,
     insert_rows_bulk,
 )
+from python_ag_grid_backend.routers.login import get_current_team_id
+from python_ag_grid_backend.database import get_connection
 import re
 
 router = APIRouter()
+
+
+def get_schema_name_for_team(team_id: str) -> str:
+    """Query the teams table to get schema_name for a given team_id."""
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT schema_name FROM teams WHERE team_id = %s", (team_id,))
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        
+        if not result:
+            raise HTTPException(status_code=404, detail="Team not found")
+        
+        return result["schema_name"]
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get team schema: {str(e)}")
 
 
 @router.post("/import-csv")
@@ -16,6 +38,7 @@ def import_csv(
     primary_keys: str = Form(None),
     table_name: str | None = Form(None),
     infer_rows: int = Form(50),
+    team_id: str = Depends(get_current_team_id),
 ):
     """
     POST multipart/form-data:
@@ -24,6 +47,9 @@ def import_csv(
       - infer_rows (optional): how many rows to sample to infer types
     """
     try:
+        # Get schema for current team 
+        schema_name = get_schema_name_for_team(team_id)
+        
         content = file.file.read()
         text = content.decode("utf-8-sig")
         reader = csv.reader(io.StringIO(text))
@@ -132,7 +158,7 @@ def import_csv(
         ]
 
         # create table (create_table uses IF NOT EXISTS)
-        create_table(table, create_cols)
+        create_table(table, create_cols, schema_name)
 
         # prepare rows aligned to columns and convert empty to None
         rows_to_insert = []
@@ -147,7 +173,7 @@ def import_csv(
         # insert in batches to avoid huge single executemany
         batch_size = 500
         for i in range(0, len(rows_to_insert), batch_size):
-            insert_rows_bulk(table, cols, rows_to_insert[i : i + batch_size])
+            insert_rows_bulk(table, cols, rows_to_insert[i : i + batch_size], schema_name)
 
         return {
             "success": True,

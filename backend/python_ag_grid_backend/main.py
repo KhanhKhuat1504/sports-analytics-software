@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZIPMiddleware
 from routers import tables, upload, login, teams
 from python_ag_grid_backend.database import init_db
 import gradio as gr 
 from chatbot_backend import assistant
 
-app = FastAPI()
+# Set max request body size to 100 MB
+app = FastAPI(max_size=100_000_000)  # 100 MB in bytes
 
 app.add_middleware(
     CORSMiddleware,
@@ -14,6 +16,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add gzip compression for large responses
+app.add_middleware(GZIPMiddleware, minimum_size=1000)
 
 @app.on_event("startup")
 def startup_event():

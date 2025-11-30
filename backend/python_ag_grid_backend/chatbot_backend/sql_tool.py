@@ -52,7 +52,8 @@ def lc_sql_engine(
         rows = con.execute(text(query))
         for row in rows:
             output += "\n" + str(row)
-    return output
+    # Return explicit message if no results to prevent message reconstruction issues
+    return output if output.strip() else "[No results found]"
 
 
 

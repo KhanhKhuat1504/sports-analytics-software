@@ -17,7 +17,7 @@ function Register() {
         formState: { errors }
     } = useForm<{ username: string; password: string; full_name?: string; is_admin?: boolean }>();
 
-    const { setToken } = useAuth();
+    // const { setToken } = useAuth();
 
     const onSubmit = async (formData: { username: string; password: string; full_name?: string; is_admin?: boolean }) => {
         setError('');

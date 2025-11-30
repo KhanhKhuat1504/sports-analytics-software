@@ -14,6 +14,7 @@ from gradio import ChatMessage
 from python_ag_grid_backend.chatbot_backend.sql_tool import lc_sql_engine
 # from .sql_tool import lc_sql_engine
 from dotenv import load_dotenv
+from langsmith import traceable
 import os
 from functools import partial
 from contextlib import asynccontextmanager
@@ -133,98 +134,3 @@ Do NOT:
 
 Your goal: preserve all meaning while reducing token length as much as possible.
 """
-
-async def interact_with_langchain_agent(agent, thread_id, prompt, history):
-    history.append(ChatMessage(role="user", content=prompt))
-    yield history 
-    print(f"\n=== 🧠 Starting astream for prompt: {prompt!r} ===")
-
-    config = {"configurable": {"thread_id": thread_id}}
-
-    async for chunk in agent.astream(
-        {"messages": [{"role": "user", "content": prompt}]}, 
-        config=config                                
-    ):
-        
-        # full raw chunk from LangGraph
-        print("\n--- RAW CHUNK ---")
-        pprint.pp(chunk)  # pretty-print nicely
-        
-        # --- (1) MODEL STEP: LLM thinking or tool call ---
-        if "agent" in chunk and "messages" in chunk["agent"]:
-            msg = chunk["agent"]["messages"][-1]
-            content = msg.content or ""
-            tool_calls = msg.additional_kwargs.get("tool_calls", [])
-
-            if tool_calls:
-                for tool in tool_calls:
-                    history.append(ChatMessage(
-                        role="assistant",
-                        content=f"🛠️ **Using tool** {tool['name']}"
-                    ))
-                    yield history
-
-            elif content.strip():
-                # final AI response
-                history.append(ChatMessage(
-                    role="assistant",
-                    content=content.strip()
-                ))
-                yield history
-
-        # --- (2) TOOL OUTPUT STEP: results from SQL engine ---
-        elif "tools" in chunk and "messages" in chunk["tools"]:
-            tool_msg = chunk["tools"]["messages"][-1]
-            content = tool_msg.content.strip()
-            status = getattr(tool_msg, "status", None)
-            if "Error:" in content or (status and status == "error"):
-                history.append(ChatMessage(
-                    role="assistant",
-                    content=f"⚠️ **Tool Error:**\n```\n{content}\n```"
-                ))
-            else:
-                history.append(ChatMessage(
-                    role="assistant",
-                    content=f"📊 **Tool Result:**\n```\n{content}\n```"
-                ))
-            yield history
-
-    print("=== ✅ Stream finished ===")
-    
-    # print("💬 Received message:", prompt)
-    # history.append(ChatMessage(role="assistant", content="Got it."))
-
-    # yield history
-    
-# async with AsyncPostgresSaver.from_conn_string(conn_info) as memory:
-#     react_agent = create_react_agent(
-#         prompt=SystemMessage(content=prompt),
-#         model=model,
-#         tools=[],
-#         # tools=[lc_sql_engine],
-#         pre_model_hook=pre_model_hook, 
-#         checkpointer=memory
-#     )
-
-def create_ui(agent, thread_id):
-    
-    async def chat_handler(message, history):
-        async for history in interact_with_langchain_agent(agent, thread_id,message, history):
-            yield history
-    
-    with gr.Blocks() as ui:
-        gr.Markdown("# Chat with a LangChain Agent 🦜⛓️ and see its thoughts 💭")
-        chatbot = gr.Chatbot(
-            type="messages",
-            label="Agent",
-            avatar_images=(
-                None,
-                "https://em-content.zobj.net/source/twitter/141/parrot_1f99c.png",
-            ),
-        )
-        input = gr.Textbox(lines=1, label="Chat Message")
-        input.submit(chat_handler, [input, chatbot], [chatbot])
-        
-    return ui
-
-

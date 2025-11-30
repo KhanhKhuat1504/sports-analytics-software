@@ -7,12 +7,20 @@ from python_ag_grid_backend.routers import tables, upload, login, assistant, tea
 # import gradio as gr
 # from python_ag_grid_backend.chatbot_backend import assistant
 from python_ag_grid_backend.database import init_db
-from python_ag_grid_backend.chatbot_backend.langchain_assistant import init_agent, create_ui
+from python_ag_grid_backend.chatbot_backend.langchain_assistant import init_agent
 from metabase_embed import router as metabase_router
 from contextlib import asynccontextmanager
 
 
 load_dotenv()
+
+# LangSmith Tracing Setup - tracks the live agent at https://smith.langchain.com
+langsmith_api_key = os.getenv("LANGSMITH_API_KEY")
+if langsmith_api_key:
+    os.environ["LANGSMITH_TRACING"] = "true"
+    os.environ["LANGSMITH_PROJECT"] = os.getenv("LANGSMITH_PROJECT", "sports-analytics-agent")
+else:
+    print("LANGSMITH_API_KEY not set - agent traces will not be recorded")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

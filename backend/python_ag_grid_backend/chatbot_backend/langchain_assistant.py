@@ -21,6 +21,8 @@ from contextlib import asynccontextmanager
 import pprint
 from typing import TypedDict
 from langchain.agents.middleware import dynamic_prompt, ModelRequest
+from langchain.tools import tool
+import re
 
 load_dotenv()
 
@@ -58,9 +60,15 @@ def schema_scoped_prompt(request: ModelRequest) -> str:
     tables_description = request.runtime.context.get("tablesDescription")
     
     schema_aware_prompt = f"""
-        You are querying from this schema.  
+        IMPORTANT SECURITY RESTRICTION:
+        You can ONLY query tables from your assigned schema below. Do NOT attempt to query information_schema, pg_catalog, or any other system schemas.
+        Only use the tables listed here:
+        
         {tables_description}
+        
         Always use fully qualified table names: schema_name.table_name
+        If you need to explore data, ONLY query the tables listed above.
+        Attempting to access system schemas will result in blocked queries.
     """
     
     return base_prompt + schema_aware_prompt

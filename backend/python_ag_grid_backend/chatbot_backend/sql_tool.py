@@ -47,13 +47,19 @@ def lc_sql_engine(
         Args:
             query: The query to perform. This should be correct SQL.
     """
-    output = ""
-    with engine.connect() as con:
-        rows = con.execute(text(query))
-        for row in rows:
-            output += "\n" + str(row)
-    # Return explicit message if no results to prevent message reconstruction issues
-    return output if output.strip() else "[No results found]"
+    try:
+        output = ""
+        with engine.connect() as con:
+            rows = con.execute(text(query))
+            for row in rows:
+                output += "\n" + str(row)
+        # Return explicit message if no results to prevent message reconstruction issues
+        return output if output.strip() else "[No results found]"
+    except Exception as e:
+        # Return error message instead of raising to prevent checkpoint pollution
+        error_msg = f"[SQL Error: {str(e)}]"
+        print(f"SQL execution error: {e}")
+        return error_msg
 
 
 

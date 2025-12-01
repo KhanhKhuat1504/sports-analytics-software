@@ -133,10 +133,21 @@ def add_table_row_endpoint(table_name: str, row: TableRowAddRequest, team_id: st
 
 
 @router.get("/{table_name}")
-def get_table_endpoint(table_name: str, team_id: str = Depends(get_current_team_id)):
+def get_table_endpoint(
+    table_name: str,
+    offset: int = 0,
+    limit: int = 1000,
+    team_id: str = Depends(get_current_team_id)
+):
+    """Fetch paginated table data.
+    
+    Query parameters:
+    - offset: Number of rows to skip (default: 0)
+    - limit: Maximum rows to return (default: 1000)
+    """
     try:
         schema_name = get_schema_name_for_team(team_id)
-        data = get_table_data(table_name, schema_name)
+        data = get_table_data(table_name, schema_name, offset, limit)
         return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

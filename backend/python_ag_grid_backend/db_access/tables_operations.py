@@ -1,13 +1,35 @@
 from python_ag_grid_backend.database import get_connection
 
 
-def get_table_data(table_name, schema_name="public"):
+def get_table_data(table_name, schema_name="public", offset=0, limit=1000):
+    """Fetch paginated table data with optional offset and limit.
+    
+    Args:
+        table_name: Name of the table
+        schema_name: Schema name (default: "public")
+        offset: Number of rows to skip (default: 0)
+        limit: Maximum rows to return (default: 1000)
+    """
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(f'SELECT * FROM "{schema_name}"."{table_name}"')
+            # Get total row count
+            cur.execute(f'SELECT COUNT(*) FROM "{schema_name}"."{table_name}"')
+            total_count = cur.fetchone()["count"]
+            
+            # Fetch paginated rows
+            cur.execute(
+                f'SELECT * FROM "{schema_name}"."{table_name}" OFFSET %s LIMIT %s',
+                (offset, limit)
+            )
             rows = cur.fetchall()
             colnames = [desc[0] for desc in cur.description]
-            return {"columns": colnames, "rows": rows}
+            return {
+                "columns": colnames,
+                "rows": rows,
+                "total": total_count,
+                "offset": offset,
+                "limit": limit
+            }
 
 
 def add_table_row(table_name, row, schema_name="public"):

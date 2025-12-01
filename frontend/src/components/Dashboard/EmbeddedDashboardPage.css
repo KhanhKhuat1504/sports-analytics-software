@@ -1,0 +1,427 @@
+/* Page background */
+.dash-page {
+    min-height: 100vh;
+    padding: 24px;
+    background-color: #f8fafc;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    color: #0f172a;
+}
+
+/* Outer card */
+.dash-card {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    padding: 20px 24px 28px;
+    box-sizing: border-box;
+}
+
+/* Header */
+.dash-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.dash-card-title-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.dash-card-title-icon {
+    margin-top: 3px;
+    color: #020617;
+}
+
+.dash-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.dash-card-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.dash-card-subtitle {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Buttons */
+.dash-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 120ms ease, box-shadow 120ms ease,
+        transform 80ms ease;
+    white-space: nowrap;
+}
+
+.dash-btn-primary {
+    background-color: #020617;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+}
+
+.dash-btn-primary:hover {
+    background-color: #020617;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.3);
+}
+
+.dash-btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
+}
+
+.dash-btn-icon .dash-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.dash-btn-large {
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+/* Body (dashed area) */
+.dash-card-body {
+    margin-top: 12px;
+    border-radius: 16px;
+    border: 2px dashed #e2e8f0;
+    padding: 48px 16px;
+}
+
+/* Empty state content */
+.dash-empty-state {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.dash-empty-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.dash-empty-icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 30% 20%, #dbeafe 0, #eff6ff 40%, #e0f2fe 100%);
+}
+
+.dash-empty-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.dash-empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 8px 0 4px;
+}
+
+.dash-empty-text {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+/* ---------- MODAL ---------- */
+
+.dash-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+}
+
+.dash-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px 24px 18px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+    box-sizing: border-box;
+}
+
+.dash-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dash-modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.dash-modal-close {
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+    color: #64748b;
+}
+
+.dash-modal-close:hover {
+    color: #0f172a;
+}
+
+.dash-modal-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 6px;
+    margin-bottom: 18px;
+}
+
+.dash-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ---------- FORM FIELDS ---------- */
+
+.dash-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dash-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #0f172a;
+}
+
+.dash-required {
+    color: #ef4444;
+}
+
+.dash-input {
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 8px 10px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.dash-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 1px #bfdbfe;
+}
+
+.dash-help-text {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* width/height row */
+
+.dash-field-row {
+    flex-direction: row;
+    gap: 12px;
+}
+
+.dash-field-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* ---------- SELECT (Dashboard Type) ---------- */
+
+.dash-select-wrapper {
+    position: relative;
+}
+
+.dash-select-trigger {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 8px 10px;
+    background: #ffffff;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: border-color 120ms ease, box-shadow 120ms ease,
+        background-color 120ms ease;
+}
+
+.dash-select-trigger.open,
+.dash-select-trigger:hover {
+    border-color: #cbd5f5;
+    background: #f8fafc;
+}
+
+.dash-select-trigger .dash-select-trigger-label {
+    color: #0f172a !important;
+    /* ← forces black */
+}
+
+.dash-select-trigger * {
+    color: #0f172a !important;
+}
+
+.dash-select-caret {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.dash-select-menu {
+    position: absolute;
+    inset-inline: 0;
+    top: calc(100% + 4px);
+    background: #0e0d0d;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+    padding: 4px 0;
+    z-index: 50;
+}
+
+.dash-select-option {
+    width: 100%;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dash-select-option:hover {
+    background: #f1f5f9;
+}
+
+/* tiny colored icons for list items */
+
+.dash-type-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.dash-type-powerbi {
+    background: linear-gradient(135deg, #facc15, #eab308);
+}
+
+.dash-type-streamlit {
+    background: linear-gradient(135deg, #ec4899, #f97316);
+}
+
+.dash-type-tableau {
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+}
+
+.dash-type-looker {
+    background: linear-gradient(135deg, #22c55e, #0ea5e9);
+}
+
+.dash-type-custom {
+    background: linear-gradient(135deg, #a855f7, #06b6d4);
+}
+
+/* ---------- EMBED TIPS ---------- */
+
+.dash-embed-tips {
+    margin-top: 4px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.dash-embed-tips-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.dash-embed-tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.dash-embed-tips-list li+li {
+    margin-top: 2px;
+}
+
+/* ---------- MODAL FOOTER ---------- */
+
+.dash-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+/* ghost button */
+
+.dash-btn-ghost {
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+}
+
+.dash-btn-ghost:hover {
+    background: #f8fafc;
+}
+
+/* responsive */
+
+@media (max-width: 600px) {
+    .dash-modal {
+        margin: 0 12px;
+        padding-inline: 16px;
+    }
+
+    .dash-field-row {
+        flex-direction: column;
+    }
+}
+
+/* FORCE dropdown trigger text to black */
+.dash-select-trigger,
+.dash-select-trigger-label,
+.dash-select-trigger * {
+    color: #0f172a !important;
+}

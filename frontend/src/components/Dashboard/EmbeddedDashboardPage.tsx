@@ -266,7 +266,7 @@ const EmbeddedDashboardPage: React.FC = () => {
         try {
             setLoadingEmbed(true);
 
-            let finalEmbedUrl: string;
+            // let finalEmbedUrl: string;
 
             if (type === "metabase") {
                 const url = await fetchMetabaseUrl(
@@ -274,7 +274,7 @@ const EmbeddedDashboardPage: React.FC = () => {
                     metabaseDashboardId,
                     metabaseSecretKey
                 );
-                finalEmbedUrl = url;
+                // finalEmbedUrl = url;
                 setEmbedUrl(url);
                 setIsConfigured(true);
             } else {
@@ -291,7 +291,7 @@ const EmbeddedDashboardPage: React.FC = () => {
                     throw new Error("Embed URL must start with https://");
                 }
 
-                finalEmbedUrl = rawUrl;
+                // finalEmbedUrl = rawUrl;
                 setEmbedUrl(rawUrl);
                 setIsConfigured(true);
             }

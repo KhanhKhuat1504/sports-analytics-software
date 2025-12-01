@@ -92,11 +92,7 @@ def import_csv(
                 detail="You must select at least one primary key column.",
             )
 
-        # peek first N rows to infer types
-        sample_rows = list(itertools.islice(reader, infer_rows))
-        # convert the rest to rows list
-        rest_rows = list(reader)
-        all_rows = sample_rows + rest_rows
+        all_rows = list(reader)
 
         # inference helpers
         def infer_type(values):
@@ -121,10 +117,10 @@ def import_csv(
                 return "FLOAT"
             return "INTEGER"
 
-        # build column types using sample
+        # build column types using all rows for accurate inference
         transposed = (
-            list(zip(*([row + [""] * (len(cols) - len(row)) for row in sample_rows])))
-            if sample_rows
+            list(zip(*([row + [""] * (len(cols) - len(row)) for row in all_rows])))
+            if all_rows
             else [[] for _ in cols]
         )
         col_types = []

@@ -42,11 +42,11 @@ def update_table_row(table_name, row, schema_name="public"):
             cur.execute(sql, values)
             conn.commit()
 
-def delete_table_row(table_name, row):
+def delete_table_row(table_name, row, schema_name="public"):
     if not row:
         raise ValueError("No data provided for deletion.")
     where = " AND ".join([f'"{k}" = %s' for k in row.keys()])
-    sql = f'DELETE FROM "{table_name}" WHERE {where}'
+    sql = f'DELETE FROM "{schema_name}"."{table_name}" WHERE {where}'
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(sql, list(row.values()))

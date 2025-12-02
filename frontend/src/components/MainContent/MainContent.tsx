@@ -28,9 +28,6 @@ const MainContent = () => {
   const [newRowData, setNewRowData] = useState<any>({});
   const [addError, setAddError] = useState<string | null>(null);
   const [tableMeta, setTableMeta] = useState<any[]>([]);
-  const [currentOffset, setCurrentOffset] = useState(0);
-  const [totalRows, setTotalRows] = useState(0);
-  const [pageSize] = useState(1000);
   const { selectedTable } = useParams();
 
   const navigate = useNavigate();
@@ -77,8 +74,6 @@ const MainContent = () => {
         return;
       }
       const data = await res.json();
-      // Reset to first page to see the new row
-      setCurrentOffset(0);
       setRowData(prev => [...prev, data.row]);
       setShowAddModal(false);
       setNewRowData({});
@@ -188,24 +183,17 @@ const MainContent = () => {
 
   useEffect(() => {
     if (selectedTable) {
-      const offset = currentOffset;
-      const limit = pageSize;
-      fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}?offset=${offset}&limit=${limit}`, { 
-        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } 
-      })
+       fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
         .then((res) => res.json())
         .then((data) => {
           setRowData(data.rows);
-          setTotalRows(data.total);
           setColumnDefs(toColumnDefs(data.columns, requiredColumns));
         });
     } else {
       setRowData([]);
       setColumnDefs([]);
-      setCurrentOffset(0);
-      setTotalRows(0);
     }
-  }, [selectedTable, requiredColumns, currentOffset, pageSize, token]);
+   }, [selectedTable, requiredColumns]);
 
   useEffect(() => {
     // Only fetch table metadata once a token exists (prevents unauthenticated requests)
@@ -288,26 +276,6 @@ const MainContent = () => {
               + Add Row
             </button>
           )}
-          {/* Pagination Controls */}
-          <div style={{ marginBottom: 16, display: "flex", gap: 10, alignItems: "center" }}>
-            <button 
-              onClick={() => setCurrentOffset(Math.max(0, currentOffset - pageSize))}
-              disabled={currentOffset === 0}
-              style={{ padding: "8px 12px", cursor: currentOffset === 0 ? "not-allowed" : "pointer" }}
-            >
-              ← Previous
-            </button>
-            <span style={{ fontSize: "14px", color: "#666" }}>
-              Rows {currentOffset + 1}–{Math.min(currentOffset + pageSize, totalRows)} of {totalRows}
-            </span>
-            <button 
-              onClick={() => setCurrentOffset(currentOffset + pageSize)}
-              disabled={currentOffset + pageSize >= totalRows}
-              style={{ padding: "8px 12px", cursor: currentOffset + pageSize >= totalRows ? "not-allowed" : "pointer" }}
-            >
-              Next →
-            </button>
-          </div>
           <AgGridReact
             rowData={rowData}
             columnDefs={[...columnDefs, actionsColDef]}

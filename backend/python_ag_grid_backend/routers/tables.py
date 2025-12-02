@@ -153,9 +153,10 @@ def update_table_row_endpoint(table_name: str, req: TableRowUpdateRequest, team_
     
 
 @router.delete("/{table_name}")
-def delete_table_row_endpoint(table_name: str, req: TableRowDeleteRequest):
+def delete_table_row_endpoint(table_name: str, req: TableRowDeleteRequest, team_id: str = Depends(get_current_team_id)):
     try:
-        delete_table_row(table_name, req.data)
+        schema_name = get_schema_name_for_team(team_id)
+        delete_table_row(table_name, req.data, schema_name)
         return {"success": True, "message": f"Row with primary key '{req.data}' deleted from table '{table_name}'."}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

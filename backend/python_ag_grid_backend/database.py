@@ -6,11 +6,12 @@ from psycopg2.extras import RealDictCursor
 from fastapi import HTTPException
 import os
 
-db_host = 'sportsdatabase.c9wy48s2kma9.us-east-2.rds.amazonaws.com'
-db_name = 'sportsdatabase'
-db_user = 'postgres'
-db_password = 'sportsanalyticspssword'
-db_port = 5432
+load_dotenv()
+
+db_host = os.getenv("DB_HOST")
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+db_port = os.getenv("DB_PORT")
 
 def get_connection():
     return psycopg2.connect(

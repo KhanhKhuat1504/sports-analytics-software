@@ -1,21 +1,3 @@
-setup:
-pip install fastapi uvicorn python_multipart
+Sportsanalytics.us is a new tool that helps coaches and team analysts to better understand complex sports data. By synthesizing and presenting dashboards from inputted team data using artificial intelligence, we aim to reduce barriers to entry for sports data analysis. In this report, we address the background for sportsanalytics.us, explain how users can manage tables, view dashboards, and receive assistance from an AI Chatbot, and explore the work we will engage in the future. Finally, at the end of this report, the individual contributions of each team member are declared.
 
-cd so that you can access main.py:
-cd backend
-
-activate venv
-python -m venv venv
-venv/Scripts/activate (tab)
-
-install libraries
-pip install -r requirements.txt
-
-run the server locally:
-uvicorn app:app --reload --host {local_host_addr} --port {port_number}
-
-{local_host_addr} - by default is 127.0.0.1
-{port_number} - we are using port 5000
-
-python -m uvicorn app:app --reload --host 127.0.0.1 --port 5000
-Remember to install necessary packages: pip install {package_name}
+Team members: Ren Harris, Will Schneider. Quan Le, Khanh Khuat, Long Nguyen, Jessie Tran

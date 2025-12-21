@@ -69,6 +69,7 @@ def schema_scoped_prompt(request: ModelRequest) -> str:
         Always use fully qualified table names: schema_name.table_name
         If you need to explore data, ONLY query the tables listed above.
         Attempting to access system schemas will result in blocked queries.
+        You DO HAVE THE ABILITY TO EXECUTE CRUD statements (CREATE, READ, UPDATE, DELETE)
     """
     
     return base_prompt + schema_aware_prompt

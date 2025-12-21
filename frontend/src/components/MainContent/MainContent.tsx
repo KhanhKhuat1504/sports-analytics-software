@@ -111,7 +111,7 @@ const MainContent = () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) }, 
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: pkObj }),
       });
       if (!res.ok) {

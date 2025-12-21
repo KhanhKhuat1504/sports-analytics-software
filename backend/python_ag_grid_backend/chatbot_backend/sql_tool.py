@@ -49,10 +49,20 @@ def lc_sql_engine(
     """
     try:
         output = ""
-        with engine.connect() as con:
-            rows = con.execute(text(query))
-            for row in rows:
-                output += "\n" + str(row)
+        with engine.begin() as con:
+            result = con.execute(text(query))
+            
+            # SELECT queries 
+            if result.returns_rows:
+                for row in result:
+                    output += "\n" + str(row)
+                return output if output.strip() else "[No results found]"
+            # INSERT, UPDATE, DELETE
+            elif result.rowcount > 0:
+                return f"[Query executed successfully. Rows affected {result.rowcount}]"
+            # ALTER/DROP/CREATE - result.rowcount = 0 or -1
+            else: 
+                return f"[Query executed successfully]"
         # Return explicit message if no results to prevent message reconstruction issues
         return output if output.strip() else "[No results found]"
     except Exception as e:

@@ -1,28 +1,30 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Register.css';
+// import { useAuth } from "../../contexts/AuthContext";
 
 
 function Register() {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
     const {
         register,
         handleSubmit,
         formState: { errors }
-    } = useForm();
+    } = useForm<{ username: string; password: string; full_name?: string; is_admin?: boolean }>();
 
-    const onSubmit = async (formData) => {
+    // const { setToken } = useAuth();
+
+    const onSubmit = async (formData: { username: string; password: string; full_name?: string; is_admin?: boolean }) => {
         setError('');
-        setSuccess('');
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:5000/api/login/register', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/login/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -30,7 +32,8 @@ function Register() {
                 body: JSON.stringify({
                     username: formData.username,
                     password: formData.password,
-                    full_name: formData.full_name
+                    full_name: formData.full_name,
+                    is_admin: !!formData.is_admin
                 }),
             });
 
@@ -40,10 +43,21 @@ function Register() {
                 throw new Error(data.message || 'Registration failed');
             }
 
-            setSuccess('Registration successful!');
+            // DISABLED: Admin account creation flow - security vulnerability fix
+            // If registering as admin, set token and go straight to tables (admin mapped to public schema)
+            // if (formData.is_admin) {
+            //     if (setToken) setToken(data.access_token);
+            //     else localStorage.setItem('token', data.access_token);
+            //     navigate('/tables');
+            //     return;
+            // }
 
-        } catch (err) {
-            setError(err.message || 'An error occurred during registration');
+            // Store temporary token for team creation flow
+            localStorage.setItem('registrationToken', data.access_token);
+            navigate('/create-first-team');
+
+        } catch (err: any) {
+            setError(err?.message || 'An error occurred during registration');
         } finally {
             setLoading(false);
         }
@@ -58,12 +72,6 @@ function Register() {
                     {error && (
                         <div className="alert alert-danger" role="alert">
                             {error}
-                        </div>
-                    )}
-
-                    {success && (
-                        <div className="alert alert-success" role="alert">
-                            {success}
                         </div>
                     )}
 
@@ -121,8 +129,20 @@ function Register() {
                                 type="text"
                                 className={`form-control`}
                                 placeholder="Full Name"
+                                {...register("full_name")}
                             />
                         </div>
+
+                        {/* DISABLED: Admin account creation - security vulnerability fix */}
+                        {/* <div className="mb-3 form-check">
+                            <input
+                                type="checkbox"
+                                className="form-check-input"
+                                id="is_admin"
+                                {...register("is_admin")}
+                            />
+                            <label className="form-check-label" htmlFor="is_admin">Register as admin (map to public schema)</label>
+                        </div> */}
 
                         <button
                             type="submit"

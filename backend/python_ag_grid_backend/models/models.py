@@ -8,6 +8,9 @@ class TableRowUpdateRequest(BaseModel):
 class TableRowAddRequest(BaseModel):
     data: dict
 
+class TableRowDeleteRequest(BaseModel):
+    data: dict
+
 class CreateTableRequest(BaseModel):
     table_name: str
     columns: List[Dict[str, str]]  # [{"name": "id", "type": "SERIAL PRIMARY KEY"}, ...]

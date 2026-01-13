@@ -1,4 +1,3 @@
-import React from "react";
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TableCard from "../TableCard/TableCard";
@@ -14,6 +13,9 @@ import CreateTableButton from "../CreateTable/CreateTable";
 import CreateTableModal from "../Modals/TableOperationsModals/CreateTableModal";
 import DeleteTableModal from "../Modals/TableOperationsModals/DeleteTableModal";
 import { toColumnDefs } from "../../utilities/TableUtilities";
+import { useAuth } from '../../contexts/AuthContext';
+
+//TODO: When user import a table that already exists, ask them if they want to overwrite the existing table or add the rows that don't already exist.
 
 const MainContent = () => {
   const [rowData, setRowData] = useState<any[]>([]);
@@ -27,9 +29,9 @@ const MainContent = () => {
   const [addError, setAddError] = useState<string | null>(null);
   const [tableMeta, setTableMeta] = useState<any[]>([]);
   const { selectedTable } = useParams();
-  console.log(columnDefs);
 
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   const defaultColDef = useMemo(() => ({
     sortable: true,
@@ -39,14 +41,31 @@ const MainContent = () => {
     resizable: true,
   }), []);
 
+  const actionsColDef = {
+    headerName: "Actions",
+    field: "actions",
+    cellRenderer: (params: any) => (
+      <div style={{ display: "flex", gap: 8 }}>
+        <span
+          style={{ color: "#ef4444", cursor: "pointer" }}
+          title="Delete"
+          onClick={() => handleDeleteRow(params.data)}
+        >
+          🗑️
+        </span>
+      </div>
+    ),
+    editable: false,
+  };
+
   const handleAddRow = async () => {
     if (!selectedTable) {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:5000/api/table/${selectedTable}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ data: newRowData }),
       });
       if (!res.ok) {
@@ -67,9 +86,9 @@ const MainContent = () => {
   const handleUpdateRow = async (updatedRowData: any, columnName: string) => {
     try {
       if (selectedTable) {
-        await fetch(`http://localhost:5000/api/table/${selectedTable}`, {
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           body: JSON.stringify({
             data: updatedRowData,
             column_name: columnName,
@@ -81,10 +100,41 @@ const MainContent = () => {
     }
   };
 
+  const handleDeleteRow = async (rowDataToDelete: any) => {
+    if (!selectedTable || requiredColumns.length === 0) return;
+    // Build PK object for all PK columns
+    const pkObj = Object.fromEntries(
+      requiredColumns.map(k => [k, rowDataToDelete[k]])
+    );
+    if (Object.values(pkObj).some(v => v === undefined)) return;
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: pkObj }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        alert(errorData.detail || "Failed to delete row");
+        return;
+      }
+      // Remove the row from state
+      setRowData(prev =>
+        prev.filter(row =>
+          !requiredColumns.every(k => row[k] === rowDataToDelete[k])
+        )
+      );
+    } catch (err) {
+      alert("Network error");
+    }
+  };
+
   const handleDeleteTable = async (tableName: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/table/delete-table/${tableName}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/delete-table/${tableName}`, {
         method: "DELETE",
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       });
       if (!res.ok) {
         const errorData = await res.json();
@@ -106,7 +156,7 @@ const MainContent = () => {
   };
 
   const fetchAllTableMeta = () => {
-    fetch("http://localhost:5000/api/table/get-tables")
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/get-tables`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
       .then(res => res.json())
       .then(data => setTableMeta(data));
   };
@@ -117,7 +167,7 @@ const MainContent = () => {
       return;
     }
     // Fetch primary key(s) when table changes
-    fetch(`http://localhost:5000/api/table/primary-key/${selectedTable}`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/primary-key/${selectedTable}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
       .then(res => res.ok ? res.json() : Promise.reject("failed to fetch primary key"))
       .then(data => {
         const pk = data.primary_key;
@@ -133,7 +183,7 @@ const MainContent = () => {
 
   useEffect(() => {
     if (selectedTable) {
-      fetch(`http://localhost:5000/api/table/${selectedTable}`)
+       fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/${selectedTable}`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
         .then((res) => res.json())
         .then((data) => {
           setRowData(data.rows);
@@ -143,11 +193,14 @@ const MainContent = () => {
       setRowData([]);
       setColumnDefs([]);
     }
-  }, [selectedTable, requiredColumns]);
+   }, [selectedTable, requiredColumns]);
 
   useEffect(() => {
-    fetchAllTableMeta();
-  }, []);
+    // Only fetch table metadata once a token exists (prevents unauthenticated requests)
+    if (token) {
+      fetchAllTableMeta();
+    }
+  }, [token]);
 
 
   return (
@@ -170,11 +223,11 @@ const MainContent = () => {
           )}
           <CreateTableButton onClick={() => setShowCreateTableModal(true)} />
           {showCreateTableModal && (
-            <CreateTableModal
+              <CreateTableModal
               onClose={() => setShowCreateTableModal(false)}
               onSuccess={() => {
                 // Refetch table list after creation
-                fetch("http://localhost:5000/api/table/get-tables")
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/get-tables`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } })
                   .then(res => res.json())
                   .then(data => setTableMeta(data));
               }}
@@ -183,8 +236,6 @@ const MainContent = () => {
         </div>
       </header>
       <div className="search-bar">
-        <input type="text" placeholder="Search tables..." />
-        <span className="tables-used">3/20 Tables Used</span>
       </div>
       {!selectedTable ? (
         <div className="table-cards">
@@ -227,7 +278,7 @@ const MainContent = () => {
           )}
           <AgGridReact
             rowData={rowData}
-            columnDefs={columnDefs}
+            columnDefs={[...columnDefs, actionsColDef]}
             defaultColDef={defaultColDef}
             singleClickEdit={true}
             onCellValueChanged={(params) => handleUpdateRow(params.data, params.colDef.field ?? "")}
@@ -241,12 +292,10 @@ const MainContent = () => {
               setNewRowData={setNewRowData}
               onAdd={async () => {
                 await handleAddRow();
-                setRequiredColumns([]);
               }}
               onCancel={() => {
                 setShowAddModal(false);
                 setNewRowData({});
-                setRequiredColumns([]);
               }}
               addError={addError}
             />

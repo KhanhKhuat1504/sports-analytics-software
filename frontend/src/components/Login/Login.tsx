@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Login.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const { setToken } = useAuth();
 
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
@@ -20,7 +23,7 @@ function Login() {
             const formData = new URLSearchParams();
             formData.append("username", username);
             formData.append("password", password);
-            const response = await fetch('http://localhost:5000/api/login/login', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/login/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -33,8 +36,8 @@ function Login() {
             if (response.ok) {
                 console.log('Login successful:', data);
 
-                localStorage.setItem("token", data.access_token)
-                localStorage.setItem("token-type", data.token_type)
+                const token = data.access_token;
+                setToken(token);
 
                 navigate("/tables")
             } else {
@@ -85,7 +88,7 @@ function Login() {
                     </form>
                     <hr className="my-3" />
                     <p className="text-center mb-0">
-                        Don't have an account? <Link to="/register">Login here</Link>
+                        Don't have an account? <Link to="/register">Register here</Link>
                     </p>
                 </div>
             </div>

@@ -1,0 +1,104 @@
+.team-selector-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+}
+
+.team-tiles {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.team-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    min-width: 120px;
+    background-color: #ffffff;
+    border: 2px solid #0d6efd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #0d6efd;
+}
+
+.team-tile:hover:not(.disabled):not(.team-create-btn) {
+    background-color: #e7f1ff;
+    border-color: #0d6efd;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.15);
+}
+
+.team-tile.active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.team-tile.active:hover {
+    background-color: #0b5ed7;
+    border-color: #0b5ed7;
+}
+
+.team-tile.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.team-tile-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.team-tile-sport {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.team-tile.active .team-tile-sport {
+    opacity: 0.95;
+}
+
+.team-create-btn {
+    background-color: #f8f9fa;
+    border: 2px dashed #28a745;
+    color: #28a745;
+}
+
+.team-create-btn:hover:not(.disabled) {
+    background-color: #f0f8f4;
+    border-color: #28a745;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.15);
+}
+
+.team-create-btn .team-tile-name {
+    font-size: 18px;
+    margin-bottom: 2px;
+}
+
+@media (max-width: 768px) {
+    .team-selector-container {
+        padding: 8px 12px;
+    }
+
+    .team-tiles {
+        gap: 6px;
+    }
+
+    .team-tile {
+        min-width: 100px;
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+}

@@ -1,15 +1,52 @@
-.team-select {
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 1px solid #e0e1e3;
-  background: #f7f8fa;
-  font-size: 1rem;
-  color: #22223b;
-  outline: none;
-  min-width: 140px;
+.navbar {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 12px 0;
 }
-.username {
-  font-size: 1rem;
-  color: #22223b;
+
+.navbar-brand {
+  font-size: 1.1rem;
+  color: #1a1a1a !important;
+  font-weight: 700;
+  margin-right: 24px;
+}
+
+.brand-name {
+  color: #0066ff;
+}
+
+.navbar-nav {
+  gap: 12px;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.9rem;
   font-weight: 500;
+  border-radius: 6px;
+  transition: all 150ms ease;
+}
+
+.btn-primary {
+  background-color: #0066ff;
+  border-color: #0066ff;
+}
+
+.btn-primary:hover {
+  background-color: #0052cc;
+  border-color: #0052cc;
+}
+
+.btn-outline-primary {
+  color: #0066ff;
+  border-color: #0066ff;
+}
+
+.btn-outline-primary:hover {
+  background-color: #e6f0ff;
+  border-color: #0066ff;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #eef0f2 !important;
 }

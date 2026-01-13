@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAuth } from '../../../contexts/AuthContext';
 import "./CreateTableModal.css";
 
 const columnTypes = [
@@ -39,6 +40,8 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({ onClose, onSuccess 
     setColumns(columns.filter((_, i) => i !== idx));
   };
 
+  const { token } = useAuth();
+
   const handleSubmit = async () => {
     if (!tableName.trim() || columns.some(col => !col.name.trim() || !col.type)) {
       setError("Table name and all columns are required.");
@@ -54,9 +57,9 @@ const CreateTableModal: React.FC<CreateTableModalProps> = ({ onClose, onSuccess 
         ? { ...col, type: col.type + " PRIMARY KEY" }
         : col
     );
-    const res = await fetch("http://localhost:5000/api/table/create-table", {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/table/create-table`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify({ table_name: tableName, columns: columnsWithPK }),
     });
     if (res.ok) {
